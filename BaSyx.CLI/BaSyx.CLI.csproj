@@ -28,8 +28,12 @@
     <PackageReference Include="NLog" Version="4.7.9" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\basyx-core\BaSyx.Models.Export\BaSyx.Models.Export.csproj" />
+  <ItemGroup Condition="Exists('..\..\basyx-dotnet-sdk\')">
+    <ProjectReference Include="..\..\basyx-dotnet-sdk\BaSyx.Models.Export\BaSyx.Models.Export.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
+    <PackageReference Include="BaSyx.Models.Export" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

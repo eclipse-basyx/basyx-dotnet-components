@@ -7,7 +7,7 @@
     <Authors>Constantin Ziesche</Authors>
     <Copyright>Copyright 2021 - Robert Bosch GmbH</Copyright>
     <PackageProjectUrl>https://wiki.eclipse.org/BaSyx</PackageProjectUrl>
-    <RepositoryUrl>https://git.eclipse.org/r/plugins/gitiles/basyx/basyx/+/master/sdks/csnet/</RepositoryUrl>
+    <RepositoryUrl>https://github.com/eclipse-basyx/basyx-dotnet-components</RepositoryUrl>
     <PackageLicenseUrl></PackageLicenseUrl>
     <Description>The official BaSyx HTTP REST-API for Asset Administration Shells</Description>
     <Company>Robert Bosch GmbH</Company>
@@ -29,11 +29,11 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Include="..\..\resources\basyxlogo.png">
+    <None Include="..\resources\basyxlogo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <Content Include="..\..\resources\Nlog.config">
+    <Content Include="..\resources\Nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <Pack>true</Pack>
@@ -41,7 +41,7 @@
       <PackageFlatten>true</PackageFlatten>
       <PackagePath>contentFiles\any\$(TargetFramework)\</PackagePath>
     </Content>
-    <Content Include="..\..\resources\ServerSettings.xml">
+    <Content Include="..\resources\ServerSettings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <Pack>true</Pack>

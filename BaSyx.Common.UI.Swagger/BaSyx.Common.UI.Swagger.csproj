@@ -5,7 +5,7 @@
     <Authors>Constantin Ziesche</Authors>
     <Copyright>Copyright 2021 - Robert Bosch GmbH</Copyright>
     <PackageProjectUrl>https://wiki.eclipse.org/BaSyx</PackageProjectUrl>
-    <RepositoryUrl>https://git.eclipse.org/r/plugins/gitiles/basyx/basyx/+/master/sdks/csnet/</RepositoryUrl>
+    <RepositoryUrl>https://github.com/eclipse-basyx/basyx-dotnet-components</RepositoryUrl>
     <PackageLicenseUrl></PackageLicenseUrl>
     <Description>The official BaSyx Common Swagger Extensions</Description>
     <Company>Robert Bosch GmbH</Company>
@@ -25,9 +25,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\basyx-core\BaSyx.Utils\BaSyx.Utils.csproj" />
     <ProjectReference Include="..\BaSyx.Components.Common.Abstractions\BaSyx.Components.Common.Abstractions.csproj" />
   </ItemGroup>
+
+  <ItemGroup Condition="Exists('..\..\basyx-dotnet-sdk\')">
+    <ProjectReference Include="..\..\basyx-dotnet-sdk\BaSyx.Utils\BaSyx.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
+    <PackageReference Include="BaSyx.Utils" Version="1.0.0" />
+  </ItemGroup>
+
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
@@ -35,7 +43,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\resources\basyxlogo.png">
+    <None Include="..\resources\basyxlogo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

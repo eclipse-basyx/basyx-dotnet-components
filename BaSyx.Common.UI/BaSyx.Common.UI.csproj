@@ -17,6 +17,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <LangVersion>8.0</LangVersion>
     <Configurations>Debug;Release</Configurations>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

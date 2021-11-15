@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -50,6 +51,7 @@ namespace BaSyx.Components.Common
 
         private readonly List<Action<IApplicationBuilder>> AppBuilderPipeline;
         private readonly List<Action<IServiceCollection>> ServiceBuilderPipeline;
+        private readonly List<Action<IEndpointRouteBuilder>> EndpointBuilderPipeline;
 
         public const string DEFAULT_CONTENT_ROOT = "Content";
         public const string DEFAULT_WEB_ROOT = "wwwroot";
@@ -91,6 +93,7 @@ namespace BaSyx.Components.Common
             WebHostBuilder = DefaultWebHostBuilder.CreateWebHostBuilder(webHostBuilderArgs, Settings);
             AppBuilderPipeline = new List<Action<IApplicationBuilder>>();
             ServiceBuilderPipeline = new List<Action<IServiceCollection>>();
+            EndpointBuilderPipeline = new List<Action<IEndpointRouteBuilder>>();
 
             WebHostBuilder.ConfigureServices( (context, services) =>
             {
@@ -160,6 +163,7 @@ namespace BaSyx.Components.Common
         }
         public virtual void Configure(Action<IApplicationBuilder> app) => AppBuilderPipeline.Add(app);
         public virtual void ConfigureServices(Action<IServiceCollection> services) => ServiceBuilderPipeline.Add(services);
+        public virtual void ConfigureEndpoints(Action<IEndpointRouteBuilder> endpoints) => EndpointBuilderPipeline.Add(endpoints);
         public virtual void UseContentRoot(string contentRoot)
         {
             _contentRoot = contentRoot;
@@ -455,6 +459,11 @@ namespace BaSyx.Components.Common
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+
+                foreach (var endpointBuilder in EndpointBuilderPipeline)
+                {
+                    endpointBuilder.Invoke(endpoints);
+                }
             });
 
             var options = new RewriteOptions().AddRedirect("^$", UI_RELATIVE_PATH);

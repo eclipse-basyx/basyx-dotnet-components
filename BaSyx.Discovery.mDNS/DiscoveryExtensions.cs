@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using BaSyx.Utils.Logging;
-using System.Net.Http;
 using BaSyx.Utils.Client.Http;
 
 namespace BaSyx.Discovery.mDNS
@@ -56,7 +55,7 @@ namespace BaSyx.Discovery.mDNS
                 {
                     foreach (var server in e.Servers)
                     {
-                        bool pingable = await BaSyx.Utils.Network.NetworkUtils.PingHostAsync(server.Address.ToString());
+                        bool pingable = await BaSyx.Utils.Network.NetworkUtils.PingHostAsync(server.Address.ToString()).ConfigureAwait(false);
                         if (pingable)
                         {
                             string uri = string.Empty;
@@ -66,7 +65,7 @@ namespace BaSyx.Discovery.mDNS
                                 uri = "http://[" + server.Address.ToString() + "]:" + server.Port + "/aas";
                             else
                                 continue;
-
+                            
                             AssemblyDescriptor(ref aasDescriptor, new Uri(uri));
                         }
                     }
@@ -97,9 +96,9 @@ namespace BaSyx.Discovery.mDNS
                 {
                     var registeredResult = assetAdministrationShellRegistry.CreateOrUpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
                     if (registeredResult.Success)
-                        registeredResult.LogResult(logger, LogLevel.Info, "Successfully registered AAS at registry");
+                        logger.Info($"Successfully registered Asset Administration Shell with {aasDescriptor.Identification.Id} at registry");
                     else
-                        registeredResult.LogResult(logger, LogLevel.Error, "Could not register AAS at registry");
+                        registeredResult.LogResult(logger, LogLevel.Error, $"Could not register Asset Administration Shell with {aasDescriptor.Identification.Id} at registry");
                 }
             }
             catch (Exception exc)
@@ -116,7 +115,7 @@ namespace BaSyx.Discovery.mDNS
 
             if (retrieveDescriptor.Success && retrieveDescriptor.Entity != null)
             {
-                retrieveDescriptor.LogResult(logger, LogLevel.Info, "Successfully retrieved AAS descriptor");
+                logger.Info($"Successfully retrieved AssetAdministrationShellDescriptor with id {retrieveDescriptor.Entity.Identification.Id}");
                 if (aasDescriptor == null)
                 {
                     aasDescriptor = retrieveDescriptor.Entity;
@@ -155,7 +154,7 @@ namespace BaSyx.Discovery.mDNS
                 }
             }
             else
-                retrieveDescriptor.LogResult(logger, LogLevel.Info, "Could not retrieve AAS descriptor");
+                retrieveDescriptor.LogResult(logger, LogLevel.Error, "Could not retrieve AssetAdministrationShell descriptor");
         }
 
         private class EndpointComparer : IEqualityComparer<IEndpoint>
@@ -190,9 +189,9 @@ namespace BaSyx.Discovery.mDNS
                             {
                                 var deletedResult = assetAdministrationShellRegistry.DeleteAssetAdministrationShellRegistration(splittedItem[1]);
                                 if (deletedResult.Success)
-                                    deletedResult.LogResult(logger, LogLevel.Info, "Successfully deregistered AAS from registry");
+                                    logger.Info($"Successfully deregistered Asset Administration Shell with id {splittedItem[1]} from registry");                                    
                                 else
-                                    deletedResult.LogResult(logger, LogLevel.Error, "Could not unregister AAS from registry");
+                                    deletedResult.LogResult(logger, LogLevel.Error, $"Could not unregister Asset Administration Shell with id {splittedItem[1]} from registry");
                             }
                         }
                     }
@@ -231,7 +230,7 @@ namespace BaSyx.Discovery.mDNS
             StartDiscovery(serviceProvider, port, ipAddresses);
         }
         /// <summary>
-        /// Starts mDNS dicovery for an Asset Administration Shell Service Provider with a list of given IP-addresses and a port
+        /// Starts mDNS discovery for an Asset Administration Shell Service Provider with a list of given IP-addresses and a port
         /// </summary>
         /// <param name="serviceProvider">The Asset Administration Shell Service Provider</param>
         /// <param name="port">The port to advertise</param>

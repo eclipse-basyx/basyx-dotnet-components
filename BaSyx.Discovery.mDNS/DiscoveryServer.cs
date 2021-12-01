@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BaSyx.Discovery.mDNS
 {
@@ -31,18 +32,16 @@ namespace BaSyx.Discovery.mDNS
         public string ServiceType { get; }
 
         private CancellationTokenSource cancellationToken;
-        private readonly Thread discoverThread;
+        private Task discoverTask;
         private readonly MulticastService mdns;
 
         public DiscoveryServer(string serviceType)
         {
             ServiceType = serviceType;
-            discoverThread = new Thread(Discover);
-            
             mdns = new MulticastService();
         }
 
-        private void Discover()
+        private async void Discover()
         {
             ServiceDiscovery sd = new ServiceDiscovery(mdns);
 
@@ -66,14 +65,13 @@ namespace BaSyx.Discovery.mDNS
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     sd.QueryAllServices();
-                    Thread.Sleep(DISCOVER_THREAD_DELAY);
+                    await Task.Delay(DISCOVER_THREAD_DELAY).ConfigureAwait(false);
                 }
             }                
             finally
             {
                 sd.Dispose();
                 mdns.Stop();
-
             }
         }
 
@@ -92,25 +90,28 @@ namespace BaSyx.Discovery.mDNS
         {
             logger.Info($"service instance '{e.ServiceInstanceName}' discovered");
 
-            var args = GetServiceInstanceEventArgs(e);
-            ServiceInstanceDiscovered?.Invoke(sender, args);
+            if (e.ServiceInstanceName.ToString().Contains(ServiceType))
+            {
+                ServiceInstanceEventArgs args = GetServiceInstanceEventArgs(e, e.ServiceInstanceName.ToString());
+                ServiceInstanceDiscovered?.Invoke(sender, args);
+            }
         }
 
         private void Sd_ServiceInstanceShutdown(object sender, ServiceInstanceShutdownEventArgs e)
         {
             logger.Info($"service instance '{e.ServiceInstanceName}' is shutting down");
 
-            var args = GetServiceInstanceEventArgs(e);
+            var args = GetServiceInstanceEventArgs(e, e.ServiceInstanceName.ToString());
             ServiceInstanceShutdown?.Invoke(sender, args);
         }
 
-        private ServiceInstanceEventArgs GetServiceInstanceEventArgs(MessageEventArgs e)
+        private ServiceInstanceEventArgs GetServiceInstanceEventArgs(MessageEventArgs e, string serviceName)
         {
             var servers = e.Message.AdditionalRecords.OfType<SRVRecord>();
             var addresses = e.Message.AdditionalRecords.OfType<AddressRecord>();
             var txtRecords = e.Message.AdditionalRecords.OfType<TXTRecord>()?.SelectMany(s => s.Strings);
 
-            ServiceInstanceEventArgs args = new ServiceInstanceEventArgs();
+            ServiceInstanceEventArgs args = new ServiceInstanceEventArgs() { ServiceName = serviceName };
             if (txtRecords?.Count() > 0)
                 args.TxtRecords.AddRange(txtRecords);
 
@@ -142,18 +143,22 @@ namespace BaSyx.Discovery.mDNS
         
         public void Start()
         {
-            logger.Info("Discover thread starting...");
-            discoverThread.Start();
-            logger.Info("Discover thread started successfully" );
+            logger.Info("Discovery task starting...");
+            cancellationToken = new CancellationTokenSource();
+            discoverTask = Task.Factory.StartNew(() => Discover(), cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            logger.Info("Discovery task started successfully" );
         }
 
 
-        public void Stop()
+        public async void Stop()
         {
-            logger.Info("Discover thread stopping...");
+            logger.Info("Discovery task stopping...");
             cancellationToken?.Cancel();
-            bool success = discoverThread.Join(DISCOVER_THREAD_DELAY + 500);
-            logger.Info("Discover thread stopped successfully:" + success);
+
+            if (await Task.WhenAny(discoverTask, Task.Delay(DISCOVER_THREAD_DELAY + 500)) == discoverTask)
+                logger.Info("Discovery task stopped successfully");
+            else
+                logger.Warn("Failed to stop discovery task - Timeout");
         }
     }
 
@@ -161,6 +166,7 @@ namespace BaSyx.Discovery.mDNS
     {
         public List<Server> Servers { get; set; }
         public List<string> TxtRecords { get; set; }
+        public string ServiceName { get; set; }
 
         public ServiceInstanceEventArgs()
         {

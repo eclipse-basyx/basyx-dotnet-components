@@ -133,19 +133,18 @@ namespace BaSyx.Submodel.Client.Http
         {
             var request = base.CreateRequest(GetUri(SUBMODEL_ELEMENTS, submodelElementId, VALUE), HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
+            response?.Entity?.Dispose();
             IResult result = base.EvaluateResponse(response, response.Entity);
             if (result.Success && result.Entity != null)
             {
                 string sValue = Encoding.UTF8.GetString((byte[])result.Entity);
-                object deserializedValue = JsonConvert.DeserializeObject(sValue);
-                response?.Entity?.Dispose();
-                return new Result<IValue>(result.Success, new ElementValue(deserializedValue, deserializedValue.GetType()), result.Messages);
+                if (!string.IsNullOrEmpty(sValue))
+                {
+                    object deserializedValue = JsonConvert.DeserializeObject(sValue);
+                    return new Result<IValue>(result.Success, new ElementValue(deserializedValue, deserializedValue?.GetType()), result.Messages);
+                }               
             }
-            else
-            {
-                response?.Entity?.Dispose();
-                return new Result<IValue>(result);
-            }
+            return new Result<IValue>(result);
         }      
 
         public IResult DeleteSubmodelElement(string submodelElementId)

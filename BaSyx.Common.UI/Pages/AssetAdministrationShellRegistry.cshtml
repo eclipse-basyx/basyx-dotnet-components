@@ -4,8 +4,6 @@
 @using BaSyx.Models.Connectivity;
 @using BaSyx.Models.Connectivity.Descriptors;
 @using BaSyx.Models.Core.Common;
-@using BaSyx.Utils.Settings.Types;
-@using Microsoft.AspNetCore.Hosting;
 @using System.Security.Cryptography;
 @using System.Text;
 @using System.Text.RegularExpressions;
@@ -20,13 +18,8 @@
         shellsDescriptors = retrievedShellDescriptors.Entity;
     }
 
-    IHostingEnvironment hostingEnvironment = Model.HostingEnvironment;
-    ServerSettings settings = Model.Settings;
-    string pathToCompanyLogo = settings.Miscellaneous.TryGetValue("CompanyLogo", out string path) ? path : string.Empty;
-
     ViewData["Title"] = "BaSyx Registry UI";
     ViewData["ApiRoot"] = "/api/v1/registry";
-    ViewData["CompanyLogo"] = pathToCompanyLogo;
 }
 
 @functions

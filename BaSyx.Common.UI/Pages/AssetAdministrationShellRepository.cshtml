@@ -1,9 +1,7 @@
 ﻿@page
 @model BaSyx.Common.UI.Pages.AssetAdministrationShellRepositoryModel
 @using BaSyx.API.Components;
-@using BaSyx.Models.Core.AssetAdministrationShell.Generics; 
-@using BaSyx.Utils.Settings.Types;
-@using Microsoft.AspNetCore.Hosting;
+@using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using System.Security.Cryptography;
 @using System.Text;
 @using System.Text.RegularExpressions;
@@ -16,15 +14,10 @@
     if (retrievedShellServiceProviders.Success && retrievedShellServiceProviders.Entity != null)
     {
         shellServiceProviders = retrievedShellServiceProviders.Entity;
-    }
-
-    IHostingEnvironment hostingEnvironment = Model.HostingEnvironment;
-    ServerSettings settings = Model.Settings;
-    string pathToCompanyLogo = settings.Miscellaneous.TryGetValue("CompanyLogo", out string path) ? path : string.Empty;
+    }  
 
     ViewData["Title"] = "Asset Administration Shell Repository";
     ViewData["ApiRoot"] = "/shells";
-    ViewData["CompanyLogo"] = pathToCompanyLogo;
     ViewData["ApiType"] = "AssetAdministrationShellRepository";
 }
 

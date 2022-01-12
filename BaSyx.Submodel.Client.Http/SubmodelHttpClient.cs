@@ -133,8 +133,8 @@ namespace BaSyx.Submodel.Client.Http
         {
             var request = base.CreateRequest(GetUri(SUBMODEL_ELEMENTS, submodelElementId, VALUE), HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
-            response?.Entity?.Dispose();
             IResult result = base.EvaluateResponse(response, response.Entity);
+            response?.Entity?.Dispose();
             if (result.Success && result.Entity != null)
             {
                 string sValue = Encoding.UTF8.GetString((byte[])result.Entity);

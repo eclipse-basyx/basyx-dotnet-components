@@ -9,6 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using BaSyx.Components.Common.Abstractions;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BaSyx.Common.UI
@@ -35,9 +36,23 @@ namespace BaSyx.Common.UI
         public static void AddBaSyxUI(this IServiceCollection services, string pageName)
         {
             services.AddMvc()
-                .AddRazorPagesOptions(options => options.Conventions.AddPageRoute("/" + pageName, "ui"));
+                .AddRazorPagesOptions(options => options.Conventions.AddPageRoute("/" + pageName, "ui"));                
 
             services.ConfigureOptions(typeof(CommonUIConfigureOptions));
+        }
+
+        public static bool TryGetValue<T>(this ViewDataDictionary<dynamic> viewDataDictionary, string key, out T value)
+        {
+            if (viewDataDictionary.TryGetValue(key, out object oValue) && oValue is T tValue && tValue != null)
+            {
+                value = tValue;
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
         }
     }
 }

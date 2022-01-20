@@ -34,14 +34,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <Content Include="..\resources\Nlog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackageFlatten>true</PackageFlatten>
-      <PackagePath>contentFiles\any\$(TargetFramework)\</PackagePath>
-    </Content>
     <Content Include="..\resources\ServerSettings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

@@ -9,7 +9,7 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using Makaretu.Dns;
-using NLog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -19,7 +19,7 @@ namespace BaSyx.Discovery.mDNS
 {
     public class DiscoveryClient : IDisposable
     {
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger<DiscoveryClient>();
 
         private ServiceDiscovery serviceDiscovery;
         private ServiceProfile serviceProfile;
@@ -42,7 +42,7 @@ namespace BaSyx.Discovery.mDNS
             Port = port;
             IPAddresses = ipAddresses ?? MulticastService.GetIPAddresses();
 
-            logger.Info("Creating service profile with" +
+            logger.LogInformation("Creating service profile with" +
                "\tServiceName=" + ServiceName +
                "\tServiceType=" + ServiceType +
                "\tPort=" + Port +
@@ -63,7 +63,7 @@ namespace BaSyx.Discovery.mDNS
 
         public void Start()
         {
-            logger.Info("Advertisement starting...");
+            logger.LogInformation("Advertisement starting...");
 
             Task.Run(() =>
             {
@@ -73,18 +73,18 @@ namespace BaSyx.Discovery.mDNS
                 mdns.Start();
             });
 
-            logger.Info("Advertisement started successfully");
+            logger.LogInformation("Advertisement started successfully");
         }
 
 
         public void Stop()
         {
-            logger.Info("Advertisement stopping...");
+            logger.LogInformation("Advertisement stopping...");
 
             serviceDiscovery.Unadvertise(serviceProfile);
             mdns.Stop();
 
-            logger.Info("Advertisement stopped successfully");
+            logger.LogInformation("Advertisement stopped successfully");
         }
 
         protected virtual void Dispose(bool disposing)

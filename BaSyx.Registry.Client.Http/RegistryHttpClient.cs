@@ -14,7 +14,7 @@ using BaSyx.Models.Core.Common;
 using BaSyx.Utils.Client.Http;
 using BaSyx.Utils.DependencyInjection;
 using BaSyx.Utils.ResultHandling;
-using NLog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,7 @@ namespace BaSyx.Registry.Client.Http
 {
     public class RegistryHttpClient : SimpleHttpClient, IAssetAdministrationShellRegistry
     {
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger<RegistryHttpClient>();
         public RegistryClientSettings Settings { get; }
 
         public const string REGISTRY_BASE_PATH = "api/v1/registry";
@@ -80,7 +80,7 @@ namespace BaSyx.Registry.Client.Http
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     IResult<IAssetAdministrationShellDescriptor> result = CreateOrUpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
-                    logger.Info("Registration-Renewal - Success: " + result.Success + " | Messages: " + result.Messages.ToString());
+                    logger.LogInformation("Registration-Renewal - Success: " + result.Success + " | Messages: " + result.Messages.ToString());
                     await Task.Delay(interval);
                 }
             }, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);

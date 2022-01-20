@@ -13,13 +13,12 @@ using BaSyx.API.Components;
 using BaSyx.Models.Connectivity;
 using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Utils.ResultHandling;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using BaSyx.Utils.Logging;
 using BaSyx.Utils.Client.Http;
+using Microsoft.Extensions.Logging;
 
 namespace BaSyx.Discovery.mDNS
 {
@@ -34,7 +33,7 @@ namespace BaSyx.Discovery.mDNS
         public const string ASSETADMINISTRATIONSHELL_ENDPOINT = "aas.endpoint";
         public const string KEY_VALUE_SEPERATOR = "=";
 
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger("DiscoveryExtensions");
 
         public static void StartDiscovery(this IAssetAdministrationShellRegistry registry)
         {
@@ -72,7 +71,7 @@ namespace BaSyx.Discovery.mDNS
                 }
                 else
                 {
-                    logger.Warn("Informations about the server are not available. Trying endpoints from TXT-record...");
+                    logger.LogWarning("Informations about the server are not available. Trying endpoints from TXT-record...");
                     if (e?.TxtRecords?.Count > 0)
                     {
                         foreach (var txtRecord in e.TxtRecords)
@@ -89,21 +88,21 @@ namespace BaSyx.Discovery.mDNS
                     }
                     else
                     {
-                        logger.Warn("Got no discovery information even from TXT-records. I'm afraid.");
+                        logger.LogWarning("Got no discovery information even from TXT-records. I'm afraid.");
                     }
                 }
                 if (aasDescriptor != null)
                 {
                     var registeredResult = assetAdministrationShellRegistry.CreateOrUpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
                     if (registeredResult.Success)
-                        logger.Info($"Successfully registered Asset Administration Shell with {aasDescriptor.Identification.Id} at registry");
+                        logger.LogInformation($"Successfully registered Asset Administration Shell with {aasDescriptor.Identification.Id} at registry");
                     else
                         registeredResult.LogResult(logger, LogLevel.Error, $"Could not register Asset Administration Shell with {aasDescriptor.Identification.Id} at registry");
                 }
             }
             catch (Exception exc)
             {
-                logger.Error(exc, "Error accessing discovered service instance");
+                logger.LogError(exc, "Error accessing discovered service instance");
             }
         }
 
@@ -115,7 +114,7 @@ namespace BaSyx.Discovery.mDNS
 
             if (retrieveDescriptor.Success && retrieveDescriptor.Entity != null)
             {
-                logger.Info($"Successfully retrieved AssetAdministrationShellDescriptor with id {retrieveDescriptor.Entity.Identification.Id}");
+                logger.LogInformation($"Successfully retrieved AssetAdministrationShellDescriptor with id {retrieveDescriptor.Entity.Identification.Id}");
                 if (aasDescriptor == null)
                 {
                     aasDescriptor = retrieveDescriptor.Entity;
@@ -189,7 +188,7 @@ namespace BaSyx.Discovery.mDNS
                             {
                                 var deletedResult = assetAdministrationShellRegistry.DeleteAssetAdministrationShellRegistration(splittedItem[1]);
                                 if (deletedResult.Success)
-                                    logger.Info($"Successfully deregistered Asset Administration Shell with id {splittedItem[1]} from registry");                                    
+                                    logger.LogInformation($"Successfully deregistered Asset Administration Shell with id {splittedItem[1]} from registry");                                    
                                 else
                                     deletedResult.LogResult(logger, LogLevel.Error, $"Could not unregister Asset Administration Shell with id {splittedItem[1]} from registry");
                             }
@@ -199,7 +198,7 @@ namespace BaSyx.Discovery.mDNS
             }
             catch (Exception exc)
             {
-                logger.Error(exc, "Error service instance shutdown");
+                logger.LogError(exc, "Error service instance shutdown");
             }
         }
 

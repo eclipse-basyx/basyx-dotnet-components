@@ -19,7 +19,6 @@ using BaSyx.Models.Core.Common;
 using BaSyx.Models.Connectivity.Descriptors;
 using System.Linq;
 using BaSyx.Models.Connectivity;
-using NLog;
 using BaSyx.Models.Communication;
 using BaSyx.Utils.DependencyInjection;
 using System.Collections.Generic;
@@ -27,6 +26,7 @@ using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace BaSyx.AAS.Client.Http
 {
@@ -35,7 +35,7 @@ namespace BaSyx.AAS.Client.Http
         IAssetAdministrationShellSubmodelClient, 
         ISubmodelRepositoryClient
     {
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger<AssetAdministrationShellHttpClient>();
         
         public static bool USE_HTTPS = true;
 

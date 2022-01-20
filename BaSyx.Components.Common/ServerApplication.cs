@@ -26,8 +26,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NLog;
-using NLog.Web;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,13 +35,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using static BaSyx.Utils.Settings.Types.ServerSettings;
 
 namespace BaSyx.Components.Common
 {
     public abstract class ServerApplication : IServerApplication
     {
-        private static readonly Logger logger = NLogBuilder.ConfigureNLog("NLog.config").GetCurrentClassLogger();        
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger<ServerApplication>();
 
         private string _contentRoot;
         private string _webRoot;
@@ -81,11 +78,8 @@ namespace BaSyx.Components.Common
             ExecutionPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             ControllerAssembly = Assembly.Load(CONTROLLER_ASSEMBLY_NAME);
 
-            if (!EmbeddedResource.CheckOrWriteRessourceToFile(typeof(ServerApplication).Assembly, Path.Combine(ExecutionPath, "NLog.config")))
-                logger.Error("NLog.config cannot be loaded or written");
-
             if (settings == null && !EmbeddedResource.CheckOrWriteRessourceToFile(typeof(ServerApplication).Assembly, Path.Combine(ExecutionPath, "ServerSettings.xml")))
-                logger.Error("ServerSettings.xml cannot be loaded or written");
+                logger.LogError("ServerSettings.xml cannot be loaded or written");
 
             Settings = settings ?? ServerSettings.LoadSettingsFromFile("ServerSettings.xml") ?? throw new ArgumentNullException(nameof(settings));
 
@@ -105,8 +99,7 @@ namespace BaSyx.Components.Common
                 Configure(app);
             });
 
-            WebHostBuilder.UseNLog();
-            ConfigureLogging(logger.GetLogLevel());
+            ConfigureLogging(LogLevel.Trace);
 
             if (string.IsNullOrEmpty(Settings.ServerConfig.Hosting.ContentPath))
                 _contentRoot = Path.Join(ExecutionPath, DEFAULT_CONTENT_ROOT);
@@ -123,7 +116,7 @@ namespace BaSyx.Components.Common
             }
             catch (Exception e)
             {
-                logger.Error(e, $"ContentRoot path {_contentRoot} cannot be created ");
+                logger.LogError(e, $"ContentRoot path {_contentRoot} cannot be created ");
             }
 
             _webRoot = Path.Join(ExecutionPath, DEFAULT_WEB_ROOT);
@@ -133,32 +126,32 @@ namespace BaSyx.Components.Common
                 if (!Directory.Exists(_webRoot))
                     Directory.CreateDirectory(_webRoot);
                 WebHostBuilder.UseWebRoot(_webRoot);
-                logger.Info($"wwwroot-Path: {_webRoot}");
+                logger.LogInformation($"wwwroot-Path: {_webRoot}");
             }
             catch (Exception e)
             {
-                logger.Error(e, $"WebRoot path {_webRoot} cannot be created ");
+                logger.LogError(e, $"WebRoot path {_webRoot} cannot be created ");
             }            
         }
 
         public virtual void Run()
         {
-            logger.Info("Starting Server...");
+            logger.LogInformation("Starting Server...");
 
             WebHostBuilder.Build().Run();
         }
         public virtual async Task RunAsync(CancellationToken cancellationToken = default)
         {
-            logger.Info("Starting Server asynchronously...");
+            logger.LogInformation("Starting Server asynchronously...");
 
             await WebHostBuilder.Build().RunAsync(cancellationToken);
         }
-        public virtual void ConfigureLogging(Microsoft.Extensions.Logging.LogLevel logLevel)
+        public virtual void ConfigureLogging(LogLevel minimumLogLevel)
         {
             WebHostBuilder.ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
-                logging.SetMinimumLevel(logLevel);
+                logging.SetMinimumLevel(minimumLogLevel);
             });
         }
         public virtual void Configure(Action<IApplicationBuilder> app) => AppBuilderPipeline.Add(app);
@@ -187,17 +180,17 @@ namespace BaSyx.Components.Common
                 using (Stream stream = content)
                 {
                     string fileName = Path.GetFileName(relativeUri.ToString());
-                    logger.Info("FileName: " + fileName);
+                    logger.LogInformation("FileName: " + fileName);
                     string directory = Path.GetDirectoryName(relativeUri.ToString()).TrimStart('\\');
-                    logger.Info("Directory: " + directory);
+                    logger.LogInformation("Directory: " + directory);
 
                     string hostingDirectory = Path.Join(_contentRoot, directory);
 
-                    logger.Info($"Try creating hosting directory if not existing: {hostingDirectory}");
+                    logger.LogInformation($"Try creating hosting directory if not existing: {hostingDirectory}");
                     Directory.CreateDirectory(hostingDirectory);
 
                     string filePath = Path.Join(hostingDirectory, fileName);
-                    logger.Info($"Try writing file: {filePath}");
+                    logger.LogInformation($"Try writing file: {filePath}");
 
                     using (FileStream fileStream = File.OpenWrite(filePath))
                     {
@@ -207,7 +200,7 @@ namespace BaSyx.Components.Common
             }
             catch (Exception e)
             {
-                logger.Error(e, $"Error providing content {relativeUri}");
+                logger.LogError(e, $"Error providing content {relativeUri}");
             }
         }
         public virtual void MapControllers(ControllerConfiguration controllerConfig)
@@ -226,7 +219,7 @@ namespace BaSyx.Components.Common
                         }
                         catch (Exception e)
                         {
-                            logger.Warn(e, $"Assembly {controllerAssemblyString} cannot be loaded - maybe it is not referenced. Try reading from file...");
+                            logger.LogWarning(e, $"Assembly {controllerAssemblyString} cannot be loaded - maybe it is not referenced. Try reading from file...");
                             try
                             {
                                 if (File.Exists(controllerAssemblyString))
@@ -238,7 +231,7 @@ namespace BaSyx.Components.Common
                             }
                             catch (Exception exp)
                             {
-                                logger.Warn(exp, $"Assembly {controllerAssemblyString} can finally not be loaded");
+                                logger.LogWarning(exp, $"Assembly {controllerAssemblyString} can finally not be loaded");
                             }
                         }
                         if (controllerAssembly != null)
@@ -257,7 +250,7 @@ namespace BaSyx.Components.Common
                                 IFileInfo fileInfo = embeddedFileProvider.GetFileInfo(xmlDocFile);
                                 if (fileInfo == null)
                                 {
-                                    logger.Warn($"{xmlDocFile} of Assembly {controllerAssemblyName} not found");
+                                    logger.LogWarning($"{xmlDocFile} of Assembly {controllerAssemblyName} not found");
                                     continue;
                                 }
                                 using (Stream stream = fileInfo.CreateReadStream())
@@ -267,11 +260,11 @@ namespace BaSyx.Components.Common
                                         stream.CopyTo(fileStream);
                                     }
                                 }
-                                logger.Info($"{xmlDocFile} of Assembly {controllerAssemblyName} has been created successfully");
+                                logger.LogInformation($"{xmlDocFile} of Assembly {controllerAssemblyName} has been created successfully");
                             }
                             catch (Exception e)
                             {
-                                logger.Warn(e, $"{xmlDocFile} of Assembly {controllerAssemblyName} cannot be read");
+                                logger.LogWarning(e, $"{xmlDocFile} of Assembly {controllerAssemblyName} cannot be read");
                             }
                         }
                     }
@@ -316,7 +309,7 @@ namespace BaSyx.Components.Common
 
             services.AddRazorPages(opts =>
             {
-                logger.Info("Pages-RootDirectory: " + opts.RootDirectory);
+                logger.LogInformation("Pages-RootDirectory: " + opts.RootDirectory);
             });
 
             services.AddDirectoryBrowser();
@@ -356,6 +349,10 @@ namespace BaSyx.Components.Common
         {
             var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
             var applicationLifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+            var loggingFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
+            
+            //Set ASP.NET Core LoggingFactory to global LoggingFactory for all other loggings within the BaSyx SDK
+            LoggingExtentions.LoggerFactory = loggingFactory;
 
             if (env.IsProduction())
                 app.UseHsts();
@@ -403,7 +400,7 @@ namespace BaSyx.Components.Common
                     RequestPath = new PathString(FILES_PATH)
                 });
             }
-
+            //This middleware fixes the issue with reverse proxies (e.g. IIS) decoding URLs within http paths
             app.Use((context, next) =>
             {
                 var url = context.GetServerVariable("UNENCODED_URL");

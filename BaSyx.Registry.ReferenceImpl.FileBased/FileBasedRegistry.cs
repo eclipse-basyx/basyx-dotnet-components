@@ -13,8 +13,8 @@ using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Models.Core.Common;
 using BaSyx.Utils.DependencyInjection;
 using BaSyx.Utils.ResultHandling;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NLog;
 using System;
 using System.IO;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
 {
     public class FileBasedRegistry : IAssetAdministrationShellRegistry
     {
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger<FileBasedRegistry>();
 
         public const string SubmodelFolder = "Submodels";
         
@@ -41,7 +41,7 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
 
             if (string.IsNullOrEmpty(FolderPath))
             {
-                logger.Error("FolderPath is null or empty");
+                logger.LogError("FolderPath is null or empty");
                 throw new ArgumentNullException("FolderPath");
             }
             if (!Directory.Exists(FolderPath))
@@ -53,13 +53,13 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
                 }
                 catch (Exception e)
                 {
-                    logger.Error("FolderPath does not exist and cannot be created: " + e.Message);
+                    logger.LogError("FolderPath does not exist and cannot be created: " + e.Message);
                     throw;
                 }
 
                 if (!info.Exists)
                 {
-                    logger.Error("FolderPath does not exist and cannot be created");
+                    logger.LogError("FolderPath does not exist and cannot be created");
                     throw new InvalidOperationException("FolderPath does not exist and cannot be created");
                 }
             }
@@ -358,7 +358,7 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
                             if (descriptor != null)
                                 submodelDescriptors.Create(descriptor);
                             else
-                                logger.Warn($"Unable to read Submodel Descriptor from {file}");
+                                logger.LogWarning($"Unable to read Submodel Descriptor from {file}");
                         }
                     }
                     return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(true, submodelDescriptors.AsQueryableElementContainer());

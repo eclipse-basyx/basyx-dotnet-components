@@ -21,18 +21,18 @@ using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Models.Connectivity;
 using System.Linq;
 using BaSyx.Utils.DependencyInjection;
-using NLog;
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace BaSyx.Submodel.Client.Http
 {
     public class SubmodelHttpClient : SimpleHttpClient, ISubmodelClient
     {
-        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LoggingExtentions.CreateLogger<SubmodelHttpClient>();
 
         public static bool USE_HTTPS = true;
 

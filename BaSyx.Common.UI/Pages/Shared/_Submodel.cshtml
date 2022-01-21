@@ -112,7 +112,7 @@
                 <span id="executeIcon_@hashedRequestPath" role="status" aria-hidden="true"></span>
                 Execute
             </button>
-            @if (operation.InputVariables?.Count > 0 || operation.OutputVariables.Count > 0)
+            @if (operation.InputVariables?.Count > 0 || operation.OutputVariables?.Count > 0)
             {
                 <button onclick="@("ClearFields('" + hashedRequestPath + "')")" type="button" class="btn btn-outline-primary">Clear</button>
             }

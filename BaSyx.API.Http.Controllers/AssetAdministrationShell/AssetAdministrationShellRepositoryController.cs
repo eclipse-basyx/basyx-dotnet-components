@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using BaSyx.Models.Core.Common;
-using System;
 using BaSyx.Models.Core.AssetAdministrationShell.Identification;
 
 namespace BaSyx.API.Http.Controllers

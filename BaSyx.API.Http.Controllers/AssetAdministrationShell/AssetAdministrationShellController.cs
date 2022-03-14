@@ -13,18 +13,13 @@ using Microsoft.AspNetCore.Hosting;
 using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 using BaSyx.Utils.ResultHandling;
 using BaSyx.API.Components;
-using BaSyx.Models.Connectivity;
-using System.Linq;
 using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
-using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Models.Communication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using BaSyx.Models.Core.Common;
 using BaSyx.Models.Core.AssetAdministrationShell.Identification;
-using System;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace BaSyx.API.Http.Controllers
 {

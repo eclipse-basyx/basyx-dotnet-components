@@ -1,4 +1,5 @@
 ﻿@model ISubmodel
+@using BaSyx.API.Http
 @using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using BaSyx.Models.Core.Common;
 @using Microsoft.AspNetCore.Html;
@@ -10,36 +11,36 @@
 @{
     Func<string, string, IProperty, IHtmlContent> ShowPropertyFooter = (submodelId, pathId, property) => new Func<object, Microsoft.AspNetCore.Mvc.Razor.HelperResult>(@<text>@{
 
-                   if (string.IsNullOrEmpty(submodelId) || string.IsNullOrEmpty(pathId) || property == null)
-                   {
-                       return;
-                   }
-                   else
-                   {
-                       string requestPath = GetRequestPath(submodelId, pathId);
-                       string inputId = GetHashString(requestPath + ";Input");
-                       string retrieveButtonId = GetHashString(requestPath + ";Retrieve");
-                       string updateButtonId = GetHashString(requestPath + ";Update");
-                       string clearButtonId = GetHashString(requestPath + ";Clear");
-                       string autoReloadCheckboxId = GetHashString(requestPath + ";AutoReload");
-            <div class="card-footer">
-                <div class="row align-items-center">
-                    <div class="col-sm-8">
-                        <input id="@inputId" type="text" class="form-control" placeholder="Value" value="@await Html.PartialAsync("_Value", property)" />
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="row">
-                            <button onclick="@("GetPropertyValue('" + requestPath + "', '" + @inputId + "')")" id="@retrieveButtonId" type="button" class="btn btn-outline-success">Read</button>
-                            <button onclick="@("SetPropertyValue('" + requestPath + "', '" + @inputId + "', $('#" + @inputId + "').val(), '" + property.ValueType?.ToString() + "')")" id="@updateButtonId" type="button" class="btn btn-outline-danger" style="margin-left: 5px;">Write</button>
-                            <button onclick="@("$('#" + @inputId + "').val('')")" id="@clearButtonId" type="button" class="btn btn-outline-primary" style="margin-left: 5px;">Clear</button>
-                            <div style="margin-top: 4px; margin-left: 5px;">
-                                <input data-toggle="toggle" data-on="AutoReload" data-off="AutoReload" data-size="sm" data-width="100" data-onstyle="dark" type="checkbox" id="@autoReloadCheckboxId" onchange="@("ToggleAutoReload('" + autoReloadCheckboxId + "', '" + retrieveButtonId + "')")">
+            if (string.IsNullOrEmpty(submodelId) || string.IsNullOrEmpty(pathId) || property == null)
+            {
+                return;
+            }
+            else
+            {
+                string requestPath = GetRequestPath(submodelId, pathId);
+                string inputId = GetHashString(requestPath + ";Input");
+                string retrieveButtonId = GetHashString(requestPath + ";Retrieve");
+                string updateButtonId = GetHashString(requestPath + ";Update");
+                string clearButtonId = GetHashString(requestPath + ";Clear");
+                string autoReloadCheckboxId = GetHashString(requestPath + ";AutoReload");
+                <div class="card-footer">
+                    <div class="row align-items-center">
+                        <div class="col-sm-8">
+                            <input id="@inputId" type="text" class="form-control" placeholder="Value" value="@await Html.PartialAsync("_Value", property)" />
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+                                <button onclick="@("GetPropertyValue('" + requestPath + "', '" + @inputId + "')")" id="@retrieveButtonId" type="button" class="btn btn-outline-success">Read</button>
+                                <button onclick="@("SetPropertyValue('" + requestPath + "', '" + @inputId + "', $('#" + @inputId + "').val(), '" + property.ValueType?.ToString() + "')")" id="@updateButtonId" type="button" class="btn btn-outline-danger" style="margin-left: 5px;">Write</button>
+                                <button onclick="@("$('#" + @inputId + "').val('')")" id="@clearButtonId" type="button" class="btn btn-outline-primary" style="margin-left: 5px;">Clear</button>
+                                <div style="margin-top: 4px; margin-left: 5px;">
+                                    <input data-toggle="toggle" data-on="AutoReload" data-off="AutoReload" data-size="sm" data-width="100" data-onstyle="dark" type="checkbox" id="@autoReloadCheckboxId" onchange="@("ToggleAutoReload('" + autoReloadCheckboxId + "', '" + retrieveButtonId + "')")">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-                   }
+            }
     }</text>)(null);
 
 Func<List<object>, IHtmlContent> ShowSubmodelElement = null;
@@ -202,19 +203,19 @@ ShowSubmodelElement = @<text>@{
         string requestPath = string.Empty;
         if (apiType == "AssetAdministrationShell")
         {
-            requestPath = "/aas/submodels/" + submodelId + "/submodel/submodel-elements/" + pathId;
+            requestPath = AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         else if (apiType == "Submodel")
         {
-            requestPath = "/submodel/submodel-elements/" + pathId;
+            requestPath = SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         else if (apiType == "AssetAdministrationShellRepository")
         {
-            requestPath = "/shells/" + aasId + "/aas/submodels/" + submodelId + "/submodel/submodel-elements/" + pathId;
+            requestPath = AssetAdministrationShellRepositoryRoutes.SHELLS_AAS.Replace("{aasIdentifier}", aasId) + AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         else if (apiType == "SubmodelRepository")
         {
-            requestPath = "/submodels/" + submodelId + "/submodel/submodel-elements/" + pathId;
+            requestPath = SubmodelRepositoryRoutes.SUBMODEL_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         return requestPath;
     }

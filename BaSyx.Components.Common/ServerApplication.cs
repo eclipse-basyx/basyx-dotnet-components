@@ -45,6 +45,7 @@ namespace BaSyx.Components.Common
         private string _contentRoot;
         private string _webRoot;
         private bool _secure = false;
+        private string _defaultRoute = null;
 
         private readonly List<Action<IApplicationBuilder>> AppBuilderPipeline;
         private readonly List<Action<IServiceCollection>> ServiceBuilderPipeline;
@@ -120,6 +121,7 @@ namespace BaSyx.Components.Common
             }
 
             _webRoot = Path.Join(ExecutionPath, DEFAULT_WEB_ROOT);
+            _defaultRoute = string.IsNullOrEmpty(Settings.ServerConfig.DefaultRoute) ? UI_RELATIVE_PATH : Settings.ServerConfig.DefaultRoute;
 
             try
             {
@@ -463,7 +465,7 @@ namespace BaSyx.Components.Common
                 }
             });
 
-            var options = new RewriteOptions().AddRedirect("^$", UI_RELATIVE_PATH);
+            var options = new RewriteOptions().AddRedirect("^$", _defaultRoute);
             app.UseRewriter(options);
 
             if (ApplicationStarted != null)

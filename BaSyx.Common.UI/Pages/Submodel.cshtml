@@ -2,13 +2,14 @@
 @model BaSyx.Common.UI.Pages.SubmodelModel
 @using BaSyx.API.Components;
 @using BaSyx.Models.Core.AssetAdministrationShell.Generics;
-
+@using BaSyx.Utils.Settings.Types;
 
 @{
     ISubmodelServiceProvider sp = Model.ServiceProvider;
+    ServerSettings settings = Model.Settings;
     ISubmodel submodel = sp.GetBinding();
 
-    ViewData["Title"] = submodel.IdShort;
+    ViewData["Title"] = settings.UIConfig?.Title ?? submodel.IdShort;
     ViewData["ApiRoot"] = "/submodel";
     ViewData["ApiType"] = "Submodel";
     ViewData["aasId"] = string.Empty;

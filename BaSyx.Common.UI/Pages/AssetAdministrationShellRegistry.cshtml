@@ -4,12 +4,14 @@
 @using BaSyx.Models.Connectivity;
 @using BaSyx.Models.Connectivity.Descriptors;
 @using BaSyx.Models.Core.Common;
+@using BaSyx.Utils.Settings.Types;
 @using System.Security.Cryptography;
 @using System.Text;
 @using System.Text.RegularExpressions;
 
 @{
     IAssetAdministrationShellRegistry registry = Model.ServiceProvider;
+    ServerSettings settings = Model.Settings;
 
     IElementContainer<IAssetAdministrationShellDescriptor> shellsDescriptors = null;
     var retrievedShellDescriptors = registry.RetrieveAllAssetAdministrationShellRegistrations();
@@ -18,7 +20,7 @@
         shellsDescriptors = retrievedShellDescriptors.Entity;
     }
 
-    ViewData["Title"] = "BaSyx Registry UI";
+    ViewData["Title"] = settings.UIConfig?.Title ?? "BaSyx Registry UI";
     ViewData["ApiRoot"] = "/api/v1/registry";
 }
 
@@ -78,8 +80,8 @@
                                         <div class="col-sm-10"><a target="_blank" href="@endpoint.Address">@endpoint.Address</a></div>
                                     </div>
                                 </li>
-                                @if (((endpoint.Type == Uri.UriSchemeHttp) || (endpoint.Type == Uri.UriSchemeHttps)) 
-                                    && !string.IsNullOrEmpty(endpoint.Address) && endpoint.Address.EndsWith("/aas"))
+                                @if (((endpoint.Type == Uri.UriSchemeHttp) || (endpoint.Type == Uri.UriSchemeHttps))
+                                   && !string.IsNullOrEmpty(endpoint.Address) && endpoint.Address.EndsWith("/aas"))
                                 {
                                     var httpEndpoint = endpoint as HttpEndpoint;
                                     string uiEndpoint = httpEndpoint.Url.GetLeftPart(UriPartial.Authority) + "/ui";
@@ -90,8 +92,8 @@
                                         </div>
                                     </li>
                                     @*<div class="embed-responsive embed-responsive-16by9">
-                                        <iframe class="embed-responsive-item" src="@endpoint.Address.Replace("/aas", "/ui")"></iframe>
-                                    </div>*@
+                                            <iframe class="embed-responsive-item" src="@endpoint.Address.Replace("/aas", "/ui")"></iframe>
+                                        </div>*@
                                 }
 
                             }
@@ -105,45 +107,45 @@
                         </div>
                         <div id="@GetHashString("Submodels_" + aas.IdShort)" class="collapse">
                             <div class="card-body">
-                                    @foreach (var submodelDescriptor in aas.SubmodelDescriptors)
-                                    {
-                                        <div class="card mb-3">
-                                            <div class="card-header" style="background:#808080">
-                                                <h4>
-                                                    <a style="color:white" data-toggle="collapse" href="#@GetHashString(submodelDescriptor.IdShort)">@submodelDescriptor.IdShort</a>
-                                                </h4>
-                                            </div>
-                                            <div id="@GetHashString(submodelDescriptor.IdShort)" class="collapse">
-                                                <ul class="list-group list-group-flush">
-                                                    @await Html.PartialAsync("_IdShort", submodelDescriptor.IdShort)
-                                                    @await Html.PartialAsync("_Identifier", submodelDescriptor.Identification)
-                                                    @await Html.PartialAsync("_Description", submodelDescriptor.Description)
-                                                </ul>                                                
-                                                <div class="card-body">
-                                                    <div class="card mb-3">
-                                                        <div class="card-header" style="background:#4aaf6d"><h4 class="text-white">Endpoints</h4></div>
-                                                        <ul class="list-group list-group-flush">
-                                                            @foreach (var endpoint in submodelDescriptor.Endpoints)
-                                                            {
-                                                                <li class="list-group-item">
-                                                                    <div class="row align-items-center">
-                                                                        <div class="col-sm-2"><b>Endpoint (@endpoint.Type)</b></div>
-                                                                        <div class="col-sm-10"><a target="_blank" href="@endpoint.Address">@endpoint.Address</a></div>
-                                                                    </div>
-                                                                </li>
-                                                            }
-                                                        </ul>
-                                                    </div>
+                                @foreach (var submodelDescriptor in aas.SubmodelDescriptors)
+                                {
+                                    <div class="card mb-3">
+                                        <div class="card-header" style="background:#808080">
+                                            <h4>
+                                                <a style="color:white" data-toggle="collapse" href="#@GetHashString(submodelDescriptor.IdShort)">@submodelDescriptor.IdShort</a>
+                                            </h4>
+                                        </div>
+                                        <div id="@GetHashString(submodelDescriptor.IdShort)" class="collapse">
+                                            <ul class="list-group list-group-flush">
+                                                @await Html.PartialAsync("_IdShort", submodelDescriptor.IdShort)
+                                                @await Html.PartialAsync("_Identifier", submodelDescriptor.Identification)
+                                                @await Html.PartialAsync("_Description", submodelDescriptor.Description)
+                                            </ul>
+                                            <div class="card-body">
+                                                <div class="card mb-3">
+                                                    <div class="card-header" style="background:#4aaf6d"><h4 class="text-white">Endpoints</h4></div>
+                                                    <ul class="list-group list-group-flush">
+                                                        @foreach (var endpoint in submodelDescriptor.Endpoints)
+                                                        {
+                                                            <li class="list-group-item">
+                                                                <div class="row align-items-center">
+                                                                    <div class="col-sm-2"><b>Endpoint (@endpoint.Type)</b></div>
+                                                                    <div class="col-sm-10"><a target="_blank" href="@endpoint.Address">@endpoint.Address</a></div>
+                                                                </div>
+                                                            </li>
+                                                        }
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                    }
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
     }
 }
 

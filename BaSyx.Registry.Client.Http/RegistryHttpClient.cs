@@ -8,7 +8,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
-using BaSyx.API.Components;
+using BaSyx.API.Interfaces;
 using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Models.Core.Common;
 using BaSyx.Utils.Client.Http;
@@ -25,7 +25,7 @@ using System.Web;
 
 namespace BaSyx.Registry.Client.Http
 {
-    public class RegistryHttpClient : SimpleHttpClient, IAssetAdministrationShellRegistry
+    public class RegistryHttpClient : SimpleHttpClient, IAssetAdministrationShellRegistryInterface
     {
         private static readonly ILogger logger = LoggingExtentions.CreateLogger<RegistryHttpClient>();
         public RegistryClientSettings Settings { get; }
@@ -79,7 +79,7 @@ namespace BaSyx.Registry.Client.Http
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    IResult<IAssetAdministrationShellDescriptor> result = CreateOrUpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
+                    IResult<IAssetAdministrationShellDescriptor> result = UpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
                     logger.LogInformation("Registration-Renewal - Success: " + result.Success + " | Messages: " + result.Messages.ToString());
                     await Task.Delay(interval);
                 }
@@ -91,7 +91,19 @@ namespace BaSyx.Registry.Client.Http
             RepeatRegistrationCancellationToken?.Cancel();
         }
 
-        public IResult<IAssetAdministrationShellDescriptor> CreateOrUpdateAssetAdministrationShellRegistration(string aasId, IAssetAdministrationShellDescriptor aasDescriptor)
+        public IResult<IAssetAdministrationShellDescriptor> CreateAssetAdministrationShellRegistration(IAssetAdministrationShellDescriptor aasDescriptor)
+        {
+            if (aasDescriptor == null)
+                return new Result<IAssetAdministrationShellDescriptor>(new ArgumentNullException(nameof(aasDescriptor)));
+
+            var request = base.CreateJsonContentRequest(GetUri(), HttpMethod.Post, aasDescriptor);
+            var response = base.SendRequest(request, CancellationToken.None);
+            var result = base.EvaluateResponse<IAssetAdministrationShellDescriptor>(response, response.Entity);
+            response?.Entity?.Dispose();
+            return result;
+        }
+
+        public IResult<IAssetAdministrationShellDescriptor> UpdateAssetAdministrationShellRegistration(string aasId, IAssetAdministrationShellDescriptor aasDescriptor)
         {
             if (string.IsNullOrEmpty(aasId))
                 return new Result<IAssetAdministrationShellDescriptor>(new ArgumentNullException(nameof(aasId)));
@@ -160,7 +172,21 @@ namespace BaSyx.Registry.Client.Http
             return result;
         }
 
-        public IResult<ISubmodelDescriptor> CreateOrUpdateSubmodelRegistration(string aasId, string submodelId, ISubmodelDescriptor submodelDescriptor)
+        public IResult<ISubmodelDescriptor> CreateSubmodelRegistration(string aasId, ISubmodelDescriptor submodelDescriptor)
+        {
+            if (string.IsNullOrEmpty(aasId))
+                return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(aasId)));
+            if (submodelDescriptor == null)
+                return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(submodelDescriptor)));
+
+            var request = base.CreateJsonContentRequest(GetUri(aasId, SUBMODEL_PATH), HttpMethod.Post, submodelDescriptor);
+            var response = base.SendRequest(request, CancellationToken.None);
+            var result = base.EvaluateResponse<ISubmodelDescriptor>(response, response.Entity);
+            response?.Entity?.Dispose();
+            return result;
+        }
+
+        public IResult<ISubmodelDescriptor> UpdateSubmodelRegistration(string aasId, string submodelId, ISubmodelDescriptor submodelDescriptor)
         {
             if (string.IsNullOrEmpty(aasId))
                 return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(aasId)));

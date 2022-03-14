@@ -2,6 +2,7 @@
 @using BaSyx.Models.Core.AssetAdministrationShell.Generics;
 @using BaSyx.Models.Core.Common;
 @using Microsoft.AspNetCore.Html;
+@using Microsoft.AspNetCore.WebUtilities;
 @using System.Security.Cryptography;
 @using System.Text;
 @using System.Text.RegularExpressions;
@@ -9,18 +10,18 @@
 @{
     Func<string, string, IProperty, IHtmlContent> ShowPropertyFooter = (submodelId, pathId, property) => new Func<object, Microsoft.AspNetCore.Mvc.Razor.HelperResult>(@<text>@{
 
-        if (string.IsNullOrEmpty(submodelId) || string.IsNullOrEmpty(pathId) || property == null)
-        {
-            return;
-        }
-        else
-        {
-            string requestPath = GetRequestPath(submodelId, pathId);
-            string inputId = GetHashString(requestPath + ";Input");
-            string retrieveButtonId = GetHashString(requestPath + ";Retrieve");
-            string updateButtonId = GetHashString(requestPath + ";Update");
-            string clearButtonId = GetHashString(requestPath + ";Clear");
-            string autoReloadCheckboxId = GetHashString(requestPath + ";AutoReload");
+                   if (string.IsNullOrEmpty(submodelId) || string.IsNullOrEmpty(pathId) || property == null)
+                   {
+                       return;
+                   }
+                   else
+                   {
+                       string requestPath = GetRequestPath(submodelId, pathId);
+                       string inputId = GetHashString(requestPath + ";Input");
+                       string retrieveButtonId = GetHashString(requestPath + ";Retrieve");
+                       string updateButtonId = GetHashString(requestPath + ";Update");
+                       string clearButtonId = GetHashString(requestPath + ";Clear");
+                       string autoReloadCheckboxId = GetHashString(requestPath + ";AutoReload");
             <div class="card-footer">
                 <div class="row align-items-center">
                     <div class="col-sm-8">
@@ -38,107 +39,107 @@
                     </div>
                 </div>
             </div>
-        }
+                   }
     }</text>)(null);
 
-    Func<List<object>, IHtmlContent> ShowSubmodelElement = null;
+Func<List<object>, IHtmlContent> ShowSubmodelElement = null;
 
-    ShowSubmodelElement = @<text>@{
-    string submodelId = item[0] as string;
-    IElementContainer<ISubmodelElement> submodelElementContainer = item[1] as IElementContainer<ISubmodelElement>;
+ShowSubmodelElement = @<text>@{
+        string submodelId = item[0] as string;
+        IElementContainer<ISubmodelElement> submodelElementContainer = item[1] as IElementContainer<ISubmodelElement>;
 
-    string sePathId = submodelElementContainer.Path;
-    string requestPath = GetRequestPath(submodelId, sePathId);
-    string hashedRequestPath = GetHashString(requestPath);
+        string sePathId = submodelElementContainer.Path;
+        string requestPath = GetRequestPath(submodelId, sePathId);
+        string hashedRequestPath = GetHashString(requestPath);
 
-    ISubmodelElement submodelElement = submodelElementContainer.Value;
+        ISubmodelElement submodelElement = submodelElementContainer.Value;
 
-    <div class="card border-dark mb-3">
-        <div class="card-header">
-            <h5>
-                <a data-toggle="collapse" href="#@hashedRequestPath">@submodelElementContainer.IdShort</a>
-            </h5>
-        </div>
-        <div id="@hashedRequestPath" class="collapse">
-            <ul class="list-group list-group-flush">
-                @await Html.PartialAsync("_DataSpecification", submodelElement.EmbeddedDataSpecifications)
-                @await Html.PartialAsync("_Description", submodelElement.Description)
-                @await Html.PartialAsync("_SemanticId", submodelElement.SemanticId)
-                @await Html.PartialAsync("_ModelElementSpecific", submodelElement)
-            </ul>
-            @if (submodelElement is IProperty property)
-            {
-                @ShowPropertyFooter(submodelId, sePathId, property)
-            }
-            else if (submodelElement is IOperation operation)
-            {
-                if (operation.InputVariables?.Count > 0)
+        <div class="card border-dark mb-3">
+            <div class="card-header">
+                <h5>
+                    <a data-toggle="collapse" href="#@hashedRequestPath">@submodelElementContainer.IdShort</a>
+                </h5>
+            </div>
+            <div id="@hashedRequestPath" class="collapse">
+                <ul class="list-group list-group-flush">
+                    @await Html.PartialAsync("_DataSpecification", submodelElement.EmbeddedDataSpecifications)
+                    @await Html.PartialAsync("_Description", submodelElement.Description)
+                    @await Html.PartialAsync("_SemanticId", submodelElement.SemanticId)
+                    @await Html.PartialAsync("_ModelElementSpecific", submodelElement)
+                </ul>
+                @if (submodelElement is IProperty property)
                 {
-                    <ul class="list-group list-group-flush">
-                        @foreach (var argument in operation.InputVariables.ToElementContainer())
-                        {
-                            <li class="list-group-item bg-light">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-2 argInName @hashedRequestPath"><b>@argument.IdShort</b></div>
-                                    <div class="col-sm-2 argInType @hashedRequestPath">@GetValueOrModelType(argument)</div>
-                                    <div class="col-sm-8">
-                                        <input id="msg" type="text" class="form-control argInValue @hashedRequestPath" name="msg" placeholder="Input Argument Value">
-                                    </div>
-                                </div>
-                            </li>
-                        }
-                    </ul>
+                    @ShowPropertyFooter(submodelId, sePathId, property)
                 }
-                if (operation.OutputVariables?.Count > 0)
+                else if (submodelElement is IOperation operation)
                 {
-                    <ul class="list-group list-group-flush">
-                        @foreach (var argument in operation.OutputVariables.ToElementContainer())
-                        {
-                            <li class="list-group-item bg-light">
-                                <div class="row align-items-center">
-                                    <div class="col-sm-2 argOutName @hashedRequestPath"><b>@argument.IdShort</b></div>
-                                    <div class="col-sm-2 argOutType @hashedRequestPath">@GetValueOrModelType(argument)</div>
-                                    <div class="col-sm-8">
-                                        <input id="argOutValue_@hashedRequestPath@argument.IdShort" type="text" class="form-control argOutValue @hashedRequestPath" name="msg" placeholder="Output Argument Value">
+                    if (operation.InputVariables?.Count > 0)
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var argument in operation.InputVariables.ToElementContainer())
+                            {
+                                <li class="list-group-item bg-light">
+                                    <div class="row align-items-center">
+                                        <div class="col-sm-2 argInName @hashedRequestPath"><b>@argument.IdShort</b></div>
+                                        <div class="col-sm-2 argInType @hashedRequestPath">@GetValueOrModelType(argument)</div>
+                                        <div class="col-sm-8">
+                                            <input id="msg" type="text" class="form-control argInValue @hashedRequestPath" name="msg" placeholder="Input Argument Value">
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    if (operation.OutputVariables?.Count > 0)
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var argument in operation.OutputVariables.ToElementContainer())
+                            {
+                                <li class="list-group-item bg-light">
+                                    <div class="row align-items-center">
+                                        <div class="col-sm-2 argOutName @hashedRequestPath"><b>@argument.IdShort</b></div>
+                                        <div class="col-sm-2 argOutType @hashedRequestPath">@GetValueOrModelType(argument)</div>
+                                        <div class="col-sm-8">
+                                            <input id="argOutValue_@hashedRequestPath@argument.IdShort" type="text" class="form-control argOutValue @hashedRequestPath" name="msg" placeholder="Output Argument Value">
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
 
-        <div class="card-footer">
-            <button id="buttonExecute_@hashedRequestPath" onclick="@("ExecuteOperation('" + requestPath +"', '" + hashedRequestPath + "')")" type="button" class="btn btn-success">
-                <span id="executeIcon_@hashedRequestPath" role="status" aria-hidden="true"></span>
-                Execute
-            </button>
-            @if (operation.InputVariables?.Count > 0 || operation.OutputVariables?.Count > 0)
-            {
-                <button onclick="@("ClearFields('" + hashedRequestPath + "')")" type="button" class="btn btn-outline-primary">Clear</button>
-            }
-            <input id="messageInput_@hashedRequestPath" type="text" class="form-control" name="opResultMsgs" style="margin-top:5px" placeholder="Operation Result Messages" disabled>
+                    <div class="card-footer">
+                        <button id="buttonExecute_@hashedRequestPath" onclick="@("ExecuteOperation('" + requestPath +"', '" + hashedRequestPath + "')")" type="button" class="btn btn-success">
+                            <span id="executeIcon_@hashedRequestPath" role="status" aria-hidden="true"></span>
+                            Execute
+                        </button>
+                        @if (operation.InputVariables?.Count > 0 || operation.OutputVariables?.Count > 0)
+                        {
+                            <button onclick="@("ClearFields('" + hashedRequestPath + "')")" type="button" class="btn btn-outline-primary">Clear</button>
+                        }
+                        <input id="messageInput_@hashedRequestPath" type="text" class="form-control" name="opResultMsgs" style="margin-top:5px" placeholder="Operation Result Messages" disabled>
+                    </div>
+                }
+                else if (submodelElementContainer.HasChildren())
+                {
+                    <div class="card-body">
+                        @foreach (var valueChild in submodelElementContainer.Children)
+                        {
+                            @ShowSubmodelElement(new List<object>() { submodelId, valueChild })
+                        }
+                    </div>
+                }
+                else if (submodelElement is IEventElement eventElement && eventElement.SubmodelElements.HasChildren())
+                {
+                    <div class="card-body">
+                        @foreach (var valueChild in eventElement.SubmodelElements.Children)
+                        {
+                            @ShowSubmodelElement(new List<object>() { submodelId, valueChild })
+                        }
+                    </div>
+                }
+            </div>
         </div>
-            }
-            else if (submodelElementContainer.HasChildren())
-            {
-                <div class="card-body">
-                    @foreach (var valueChild in submodelElementContainer.Children)
-                    {
-                        @ShowSubmodelElement(new List<object>() { submodelId, valueChild })
-                    }
-                </div>
-            }
-            else if (submodelElement is IEventElement eventElement && eventElement.SubmodelElements.HasChildren())
-            {
-                <div class="card-body">
-                    @foreach (var valueChild in eventElement.SubmodelElements.Children)
-                    {
-                        @ShowSubmodelElement(new List<object>() { submodelId, valueChild })
-                    }
-                </div>
-            }
-        </div>
-    </div>
 }</text>;
 }
 
@@ -170,7 +171,7 @@
                                 if (submodelElement == null)
                                 { continue; }
 
-                                @ShowSubmodelElement(new List<object>() { submodel.IdShort, submodelElement });
+                                @ShowSubmodelElement(new List<object>() { submodel.Identification.Id, submodelElement });
                             }
                         </div>
                     </div>
@@ -189,33 +190,40 @@
 
         if (!string.IsNullOrEmpty(aasId))
         {
-            aasId = System.Web.HttpUtility.UrlEncode(aasId);
+            aasId = Base64UrlEncode(aasId);
         }
 
         if (!string.IsNullOrEmpty(submodelId))
         {
-            submodelId = System.Web.HttpUtility.UrlEncode(submodelId);
+            submodelId = Base64UrlEncode(submodelId);
         }
 
         string apiType = (string)ViewData["ApiType"];
         string requestPath = string.Empty;
-        if(apiType == "AssetAdministrationShell")
+        if (apiType == "AssetAdministrationShell")
         {
-            requestPath = "/aas/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
+            requestPath = "/aas/submodels/" + submodelId + "/submodel/submodel-elements/" + pathId;
         }
-        else if(apiType == "Submodel")
+        else if (apiType == "Submodel")
         {
-            requestPath = "/submodel/submodelElements/" + pathId;
+            requestPath = "/submodel/submodel-elements/" + pathId;
         }
-        else if(apiType == "AssetAdministrationShellRepository")
+        else if (apiType == "AssetAdministrationShellRepository")
         {
-            requestPath = "/shells/" + aasId + "/aas/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
+            requestPath = "/shells/" + aasId + "/aas/submodels/" + submodelId + "/submodel/submodel-elements/" + pathId;
         }
-        else if(apiType == "SubmodelRepository")
+        else if (apiType == "SubmodelRepository")
         {
-            requestPath = "/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
+            requestPath = "/submodels/" + submodelId + "/submodel/submodel-elements/" + pathId;
         }
         return requestPath;
+    }
+
+    public static string Base64UrlEncode(string toEncode)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(toEncode);
+        string encoded = Base64UrlTextEncoder.Encode(bytes);
+        return encoded;
     }
 
     public string GetValueOrModelType(ISubmodelElement submodelElement)

@@ -27,12 +27,12 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using BaSyx.Models.Core.AssetAdministrationShell.Identification;
 
 namespace BaSyx.AAS.Client.Http
 {
     public class AssetAdministrationShellHttpClient : SimpleHttpClient, 
         IAssetAdministrationShellClient, 
-        IAssetAdministrationShellSubmodelClient, 
         ISubmodelRepositoryClient
     {
         private static readonly ILogger logger = LoggingExtentions.CreateLogger<AssetAdministrationShellHttpClient>();
@@ -107,7 +107,7 @@ namespace BaSyx.AAS.Client.Http
             return result;
         }
 
-        public IResult<IAssetAdministrationShell> RetrieveAssetAdministrationShell()
+        public IResult<IAssetAdministrationShell> RetrieveAssetAdministrationShell(RequestContent content)
         {
             var request = base.CreateRequest(GetUri(), HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
@@ -116,11 +116,20 @@ namespace BaSyx.AAS.Client.Http
             return result;
         }
 
-        public IResult<ISubmodel> CreateOrUpdateSubmodel(ISubmodel submodel)
+        public IResult<ISubmodel> CreateSubmodel(ISubmodel submodel)
         {
-            var request = base.CreateJsonContentRequest(GetUri(SUBMODELS, submodel.IdShort), HttpMethod.Put, submodel);
+            var request = base.CreateJsonContentRequest(GetUri(SUBMODELS), HttpMethod.Post, submodel);
             var response = base.SendRequest(request, CancellationToken.None);
-            var result = base.EvaluateResponse<ISubmodel>(response, response.Entity); 
+            var result = base.EvaluateResponse<ISubmodel>(response, response.Entity);
+            response?.Entity?.Dispose();
+            return result;
+        }
+
+        public IResult UpdateSubmodel(string submodelIdentifier, ISubmodel submodel)
+        {
+            var request = base.CreateJsonContentRequest(GetUri(SUBMODELS, submodelIdentifier), HttpMethod.Put, submodel);
+            var response = base.SendRequest(request, CancellationToken.None);
+            var result = base.EvaluateResponse(response, response.Entity); 
             response?.Entity?.Dispose();
             return result;
         }
@@ -250,6 +259,36 @@ namespace BaSyx.AAS.Client.Http
             var result = base.EvaluateResponse<InvocationResponse>(response, response.Entity);
             response?.Entity?.Dispose();
             return result;
-        }       
+        }
+
+        public IResult UpdateAssetAdministrationShell(IAssetAdministrationShell aas)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IResult<IAssetInformation> RetrieveAssetInformation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IResult UpdateAssetInformation(IAssetInformation assetInformation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IResult<IEnumerable<IReference<ISubmodel>>> RetrieveAllSubmodelReferences()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IResult<IReference> CreateSubmodelReference(IReference submodelRef)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IResult DeleteSubmodelReference(string submodelIdentifier)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

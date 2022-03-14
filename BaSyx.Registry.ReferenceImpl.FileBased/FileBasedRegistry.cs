@@ -8,7 +8,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
-using BaSyx.API.Components;
+using BaSyx.API.Interfaces;
 using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Models.Core.Common;
 using BaSyx.Utils.DependencyInjection;
@@ -23,7 +23,7 @@ using System.Text;
 
 namespace BaSyx.Registry.ReferenceImpl.FileBased
 {
-    public class FileBasedRegistry : IAssetAdministrationShellRegistry
+    public class FileBasedRegistry : IAssetAdministrationShellRegistryInterface
     {
         private static readonly ILogger logger = LoggingExtentions.CreateLogger<FileBasedRegistry>();
 
@@ -64,7 +64,10 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
                 }
             }
         }
-        public IResult<IAssetAdministrationShellDescriptor> CreateOrUpdateAssetAdministrationShellRegistration(string aasId, IAssetAdministrationShellDescriptor aasDescriptor)
+
+        public IResult<IAssetAdministrationShellDescriptor> CreateAssetAdministrationShellRegistration(IAssetAdministrationShellDescriptor aasDescriptor)
+            => UpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
+        public IResult<IAssetAdministrationShellDescriptor> UpdateAssetAdministrationShellRegistration(string aasId, IAssetAdministrationShellDescriptor aasDescriptor)
         {
             if(string.IsNullOrEmpty(aasId))
                 return new Result<IAssetAdministrationShellDescriptor>(new ArgumentNullException(nameof(aasId)));
@@ -87,7 +90,7 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
                 {
                     foreach (var submodelDescriptor in aasDescriptor.SubmodelDescriptors)
                     {
-                        var interimResult = CreateOrUpdateSubmodelRegistration(aasId, submodelDescriptor.Identification.Id, submodelDescriptor);
+                        var interimResult = UpdateSubmodelRegistration(aasId, submodelDescriptor.Identification.Id, submodelDescriptor);
                         if (!interimResult.Success)
                             return new Result<IAssetAdministrationShellDescriptor>(interimResult);
                     }
@@ -107,7 +110,10 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
             }
         }
 
-        public IResult<ISubmodelDescriptor> CreateOrUpdateSubmodelRegistration(string aasId, string submodelId, ISubmodelDescriptor submodelDescriptor)
+        public IResult<ISubmodelDescriptor> CreateSubmodelRegistration(string aasId, ISubmodelDescriptor submodelDescriptor)
+            => UpdateSubmodelRegistration(aasId, submodelDescriptor.Identification.Id, submodelDescriptor);
+
+        public IResult<ISubmodelDescriptor> UpdateSubmodelRegistration(string aasId, string submodelId, ISubmodelDescriptor submodelDescriptor)
         {
             if (string.IsNullOrEmpty(aasId))
                 return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(aasId)));

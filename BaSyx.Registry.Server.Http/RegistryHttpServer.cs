@@ -8,7 +8,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
-using BaSyx.API.Components;
+using BaSyx.API.Interfaces;
 using BaSyx.Components.Common;
 using BaSyx.Utils.Settings.Types;
 using Microsoft.AspNetCore.Builder;
@@ -34,11 +34,11 @@ namespace BaSyx.Registry.Server.Http
             WebHostBuilder.UseSetting(WebHostDefaults.ApplicationKey, entryAssembly.FullName);
         }
 
-        public void SetRegistryProvider(IAssetAdministrationShellRegistry aasRegistryProvider)
+        public void SetRegistryProvider(IAssetAdministrationShellRegistryInterface aasRegistryProvider)
         {
             WebHostBuilder.ConfigureServices(services =>
             {
-                services.AddSingleton<IAssetAdministrationShellRegistry>(aasRegistryProvider);
+                services.AddSingleton<IAssetAdministrationShellRegistryInterface>(aasRegistryProvider);
             });
         }
     }

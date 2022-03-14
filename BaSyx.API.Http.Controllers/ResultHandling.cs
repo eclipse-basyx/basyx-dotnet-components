@@ -10,8 +10,12 @@
 *******************************************************************************/
 using BaSyx.API.Components;
 using BaSyx.Utils.ResultHandling;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using System;
+using System.Net;
+using System.Text;
 using System.Web;
 
 namespace BaSyx.API.Http.Controllers
@@ -21,6 +25,30 @@ namespace BaSyx.API.Http.Controllers
     /// </summary>
     public static class ResultHandling
     {
+        /// <summary>
+        /// Encodes a string to a Base64UrlEncoded string (UTF8)
+        /// </summary>
+        /// <param name="toEncode">String to encode</param>
+        /// <returns></returns>
+        public static string Base64UrlEncode(string toEncode)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(toEncode);
+            string encoded = Base64UrlTextEncoder.Encode(bytes);
+            return encoded;
+        }
+
+        /// <summary>
+        /// Decodes a Base64UrlEncoded string to a regular string(UTF8)
+        /// </summary>
+        /// <param name="toDecode">String to decode</param>
+        /// <returns></returns>
+        public static string Base64UrlDecode(string toDecode)
+        {
+            byte[] bytes = Base64UrlTextEncoder.Decode(toDecode);
+            string decoded = Encoding.UTF8.GetString(bytes);
+            return decoded;
+        }
+
         /// <summary>
         /// Checks whether submodelId is null or Submodel Service Provider cannot be found
         /// </summary>
@@ -37,6 +65,7 @@ namespace BaSyx.API.Http.Controllers
                 provider = null;
                 return true;
             }
+            submodelId = Base64UrlDecode(submodelId);
             var retrieved = spRegistry.GetSubmodelServiceProvider(submodelId);
             if (!retrieved.Success || retrieved?.Entity == null)
             {
@@ -66,7 +95,7 @@ namespace BaSyx.API.Http.Controllers
                 return true;
             }
             aasId = HttpUtility.UrlDecode(aasId);
-            var retrievedProvider = serviceProvider.GetAssetAdministrationShellServiceProvider(aasId);
+            var retrievedProvider = serviceProvider.ShellProviderRegistry.GetAssetAdministrationShellServiceProvider(aasId);
             if (retrievedProvider.TryGetEntity(out provider))
             {
                 result = null;
@@ -97,7 +126,7 @@ namespace BaSyx.API.Http.Controllers
                 return true;
             }
             submodelId = HttpUtility.UrlDecode(submodelId);
-            var retrievedProvider = serviceProvider.GetSubmodelServiceProvider(submodelId);
+            var retrievedProvider = serviceProvider.SubmodelProviderRegistry.GetSubmodelServiceProvider(submodelId);
             if (retrievedProvider.TryGetEntity(out provider))
             {
                 result = null;
@@ -198,8 +227,10 @@ namespace BaSyx.API.Http.Controllers
                 else
                 {
                     IMessage message = result.Messages?.Find(m => m.Code != null);
-                    if (message != null && Int32.TryParse(message.Code, out int statusCode))
+                    if (message != null && Int32.TryParse(message.Code, out int statusCode) && Enum.IsDefined(typeof(HttpStatusCode), statusCode))
                         objectResult.StatusCode = statusCode;
+                    else
+                        objectResult.StatusCode = 500;
                 }
                 return objectResult;
             }

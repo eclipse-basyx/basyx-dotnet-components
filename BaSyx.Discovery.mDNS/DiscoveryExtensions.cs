@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net;
 using BaSyx.Utils.Client.Http;
 using Microsoft.Extensions.Logging;
+using BaSyx.API.Interfaces;
 
 namespace BaSyx.Discovery.mDNS
 {
@@ -26,7 +27,7 @@ namespace BaSyx.Discovery.mDNS
     {
         private static DiscoveryServer discoveryServer;
         private static DiscoveryClient discoveryClient;
-        private static IAssetAdministrationShellRegistry assetAdministrationShellRegistry;
+        private static IAssetAdministrationShellRegistryInterface assetAdministrationShellRegistry;
 
         public const string ASSETADMINISTRATIONSHELL_ID = "aas.id";
         public const string ASSETADMINISTRATIONSHELL_IDSHORT = "aas.idShort";
@@ -35,7 +36,7 @@ namespace BaSyx.Discovery.mDNS
 
         private static readonly ILogger logger = LoggingExtentions.CreateLogger("DiscoveryExtensions");
 
-        public static void StartDiscovery(this IAssetAdministrationShellRegistry registry)
+        public static void StartDiscovery(this IAssetAdministrationShellRegistryInterface registry)
         {
             assetAdministrationShellRegistry = registry;
 
@@ -93,7 +94,7 @@ namespace BaSyx.Discovery.mDNS
                 }
                 if (aasDescriptor != null)
                 {
-                    var registeredResult = assetAdministrationShellRegistry.CreateOrUpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
+                    var registeredResult = assetAdministrationShellRegistry.UpdateAssetAdministrationShellRegistration(aasDescriptor.Identification.Id, aasDescriptor);
                     if (registeredResult.Success)
                         logger.LogInformation($"Successfully registered Asset Administration Shell with {aasDescriptor.Identification.Id} at registry");
                     else
@@ -202,7 +203,7 @@ namespace BaSyx.Discovery.mDNS
             }
         }
 
-        public static void StopDiscovery(this IAssetAdministrationShellRegistry registryHttpServer)
+        public static void StopDiscovery(this IAssetAdministrationShellRegistryInterface registryHttpServer)
         {
             discoveryServer.ServiceInstanceDiscovered -= DiscoveryServer_ServiceInstanceDiscovered;
             discoveryServer.ServiceInstanceShutdown -= DiscoveryServer_ServiceInstanceShutdown;

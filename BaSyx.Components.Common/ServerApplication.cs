@@ -412,33 +412,6 @@ namespace BaSyx.Components.Common
                 return next();
             });
 
-            app.Use((context, next) =>
-            {
-                string requestPath = context.Request.Path.ToUriComponent();
-                
-                if (requestPath.Contains("submodelElements/"))
-                {
-                    Match valueMatch = Regex.Match(requestPath, "(?<=submodelElements/)(.*)(?=/value|/invoke|/invocationList|/upload)");
-                    if(valueMatch.Success && !string.IsNullOrEmpty(valueMatch.Value))
-                    {
-                        string elementPath = HttpUtility.UrlEncode(valueMatch.Value);
-                        requestPath = requestPath.Replace(valueMatch.Value, elementPath);
-                        context.Request.Path = new PathString(requestPath);
-                    }
-                    else
-                    {
-                        Match baseMatch = Regex.Match(requestPath, "(?<=submodelElements/)(.*)");
-                        if(baseMatch.Success && !string.IsNullOrEmpty(baseMatch.Value))
-                        {
-                            string elementPath = HttpUtility.UrlEncode(baseMatch.Value);
-                            requestPath = requestPath.Replace(baseMatch.Value, elementPath);
-                            context.Request.Path = new PathString(requestPath);
-                        }
-                    }
-                }
-                return next();
-            });
-
             foreach (var appBuilder in AppBuilderPipeline)
             {
                 appBuilder.Invoke(app);

@@ -20,6 +20,7 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
+using BaSyx.Models.Core.Common;
 
 namespace BaSyx.API.Http.Controllers
 {
@@ -60,317 +61,254 @@ namespace BaSyx.API.Http.Controllers
 #endif
 
         /// <summary>
-        /// Retrieves all Submodels from the Submodel repository
+        /// Returns all Submodels
         /// </summary>
-        /// <returns></returns>
-        /// <response code="200">Returns a list of found Submodels</response>       
-        [HttpGet("submodels", Name = "GetAllSubmodelsFromRepo")]
+        /// <param name="semanticId">The value of the semantic id reference (BASE64-URL-encoded)</param>
+        /// <param name="idShort">The Submodel's idShort</param>
+        /// <returns>Requested Submodels</returns>
+        [HttpGet(SubmodelRepositoryRoutes.SUBMODELS, Name = "GetAllSubmodels")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(List<Submodel>), 200)]
-        public IActionResult GetAllSubmodelsFromRepo()
+        public IActionResult GetAllSubmodels([FromQuery] string semanticId = null, [FromQuery] string idShort = null)
         {
             var result = serviceProvider.RetrieveSubmodels();
             return result.CreateActionResult(CrudOperation.Retrieve);
         }
+
         /// <summary>
-        /// Retrieves a specific Submodel from the Submodel repository
+        /// Creates a new Submodel
         /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
+        /// <param name="submodel">Submodel object</param>
         /// <returns></returns>
-        /// <response code="200">Returns the requested Submodel</response>
+        /// <response code="201">Submodel created successfully</response>
+        /// <response code="400">Bad Request</response>             
+        [HttpPost(SubmodelRepositoryRoutes.SUBMODELS, Name = "PostSubmodel")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(Submodel), 201)]
+        public IActionResult PostSubmodel([FromBody] ISubmodel submodel)
+        {
+            if (submodel == null)
+                return ResultHandling.NullResult(nameof(submodel));
+
+            //ToDo: URL-Encoded Base64
+            string submodelId = submodel.Identification.Id;
+
+            var result = serviceProvider.CreateSubmodel(submodel);
+            return result.CreateActionResult(CrudOperation.Create, SubmodelRepositoryRoutes.SUBMODELS + "/ " + submodelId);
+        }
+
+        /// <summary>
+        /// Returns a specific Submodel
+        /// </summary>
+        /// <param name="submodelIdentifier">The Submodel’s unique id (BASE64-URL-encoded)</param>
+        /// <returns></returns>
+        /// <response code="200">Requested Submodel</response>
         /// <response code="404">No Submodel found</response>        
-        [HttpGet("submodels/{submodelId}")]
-        [HttpGet("submodels/{submodelId}/submodel", Name = "RetrieveSubmodelFromRepoById")]
+        [HttpGet(SubmodelRepositoryRoutes.SUBMODEL_BYID, Name = "GetSubmodelById")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(Submodel), 200)]
-        public IActionResult RetrieveSubmodelFromRepoById(string submodelId)
+        public IActionResult GetSubmodelById(string submodelIdentifier)
         {
-            if (string.IsNullOrEmpty(submodelId))
-                return ResultHandling.NullResult(nameof(submodelId));
+            if (string.IsNullOrEmpty(submodelIdentifier))
+                return ResultHandling.NullResult(nameof(submodelIdentifier));
 
-            submodelId = HttpUtility.UrlDecode(submodelId);
+            submodelIdentifier = HttpUtility.UrlDecode(submodelIdentifier);
 
-            var result = serviceProvider.RetrieveSubmodel(submodelId);
+            var result = serviceProvider.RetrieveSubmodel(submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
         }
 
         /// <summary>
-        /// Creates or updates a Submodel at the Submodel repository
+        /// Updates an existing Submodel
         /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="submodel">The Submodel object</param>
+        /// <param name="submodelIdentifier">The Submodel’s unique id (BASE64-URL-encoded)</param>
+        /// <param name="submodel">Submodel object</param>
         /// <returns></returns>
-        /// <response code="201">Submodel created / updated successfully</response>
+        /// <response code="201">Submodel updated successfully</response>
         /// <response code="400">Bad Request</response>             
-        [HttpPut("submodels/{submodelId}", Name = "PutSubmodelToRepo")]
+        [HttpPut(SubmodelRepositoryRoutes.SUBMODEL_BYID, Name = "PutSubmodelById")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(Submodel), 201)]
-        public IActionResult PutSubmodelToRepo(string submodelId, [FromBody] ISubmodel submodel)
+        public IActionResult PutSubmodelById(string submodelIdentifier, [FromBody] ISubmodel submodel)
         {
-            if (string.IsNullOrEmpty(submodelId))
-                return ResultHandling.NullResult(nameof(submodelId));
+            if (string.IsNullOrEmpty(submodelIdentifier))
+                return ResultHandling.NullResult(nameof(submodelIdentifier));
             if (submodel == null)
                 return ResultHandling.NullResult(nameof(submodel));
 
-            submodelId = HttpUtility.UrlDecode(submodelId);
+            submodelIdentifier = HttpUtility.UrlDecode(submodelIdentifier);
 
-            if (submodelId != submodel.Identification.Id)
+            if (submodelIdentifier != submodel.Identification.Id)
             {
                 Result badRequestResult = new Result(false,
-                    new Message(MessageType.Error, $"Passed path parameter {submodelId} does not equal the Submodel's Id {submodel.Identification.Id}", "400"));
+                    new Message(MessageType.Error, $"Passed path parameter {submodelIdentifier} does not equal the Submodel's Id {submodel.Identification.Id}", "400"));
 
-                return badRequestResult.CreateActionResult(CrudOperation.Create, "submodels/" + submodelId);
+                return badRequestResult.CreateActionResult(CrudOperation.Create, "submodels/" + submodelIdentifier);
             }
 
             var result = serviceProvider.CreateSubmodel(submodel);
-            return result.CreateActionResult(CrudOperation.Create, "submodels/"+ submodelId);
+            return result.CreateActionResult(CrudOperation.Create, "submodels/" + submodelIdentifier);
         }
+
+
         /// <summary>
-        /// Deletes a specific Submodel at the Submodel repository 
+        /// Deletes a Submodel
         /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
+        /// <param name="submodelIdentifier">The Submodel’s unique id (BASE64-URL-encoded)</param>
         /// <returns></returns>
         /// <response code="200">Submodel deleted successfully</response>
-        [HttpDelete("submodels/{submodelId}", Name = "DeleteSubmodelFromRepoById")]
+        [HttpDelete(SubmodelRepositoryRoutes.SUBMODEL_BYID, Name = "DeleteSubmodelById")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(Result), 200)]
-        public IActionResult DeleteSubmodelFromRepoById(string submodelId)
+        [ProducesResponseType(204)]
+        public IActionResult DeleteSubmodelById(string submodelIdentifier)
         {
-            if (string.IsNullOrEmpty(submodelId))
-                return ResultHandling.NullResult(nameof(submodelId));
+            if (string.IsNullOrEmpty(submodelIdentifier))
+                return ResultHandling.NullResult(nameof(submodelIdentifier));
 
-            submodelId = HttpUtility.UrlDecode(submodelId);
+            submodelIdentifier = HttpUtility.UrlDecode(submodelIdentifier);
 
-            var result = serviceProvider.DeleteSubmodel(submodelId);
+            var result = serviceProvider.DeleteSubmodel(submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Delete);
         }
 
-        /*****************************************************************************************/
-        #region Routed Submodel Services
+        #region Submodel Interface
 
-        /// <summary>
-        /// Retrieves the minimized version of a Submodel, i.e. only the values of SubmodelElements are serialized and returned
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <returns></returns>
-        /// <response code="200">Success</response>
-        /// <response code="404">Submodel not found</response>       
-        [HttpGet("submodels/{submodelId}/submodel/values", Name = "SubmodelRepo_GetSubmodelValues")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_GetSubmodelValues(string submodelId)
-        {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
-                return result;
-
-            var service = new SubmodelController(provider, hostingEnvironment);
-            return service.GetSubmodelValues();
-        }
-
-        /// <summary>
-        /// Retrieves all Submodel-Elements from the Submodel
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <returns></returns>
-        /// <response code="200">Returns a list of found Submodel-Elements</response>
-        /// <response code="404">Submodel not found</response>       
-        [HttpGet("submodels/{submodelId}/submodel/submodelElements", Name = "SubmodelRepo_GetSubmodelElements")]
+        /// <inheritdoc cref="SubmodelController.GetAllSubmodelElements(RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpGet(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS, Name = "SubmodelRepo_GetAllSubmodelElements")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(SubmodelElement[]), 200)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_GetSubmodelElements(string submodelId)
+        public IActionResult SubmodelRepo_GetAllSubmodelElements(string submodelIdentifier, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.GetSubmodelElements();
+            return service.GetAllSubmodelElements(level, content, extent);
         }
 
-        /// <summary>
-        /// Creates or updates a Submodel-Element at the Submodel
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="seIdShortPath">The Submodel-Element's IdShort-Path</param>
-        /// <param name="submodelElement">The Submodel-Element object</param>
-        /// <returns></returns>
-        /// <response code="201">Submodel-Element created successfully</response>
-        /// <response code="400">Bad Request</response>
-        /// <response code="404">Submodel not found</response>
-        [HttpPut("submodels/{submodelId}/submodel/submodelElements/{seIdShortPath}", Name = "SubmodelRepo_PutSubmodelElement")]
+        /// <inheritdoc cref="SubmodelController.PostSubmodelElement(ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpPost(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS, Name = "SubmodelRepo_PostSubmodelElement")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_PutSubmodelElement(string submodelId, string seIdShortPath, [FromBody] ISubmodelElement submodelElement)
+        public IActionResult SubmodelRepo_PostSubmodelElement(string submodelIdentifier, [FromBody] ISubmodelElement submodelElement)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.PutSubmodelElement(seIdShortPath, submodelElement);
+            return service.PostSubmodelElement(submodelElement);
         }
-        /// <summary>
-        /// Retrieves a specific Submodel-Element from the Submodel
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="seIdShortPath">The Submodel-Element's IdShort-Path</param>
-        /// <returns></returns>
-        /// <response code="200">Returns the requested Submodel-Element</response>
-        /// <response code="404">Submodel / Submodel-Element not found</response>     
-        [HttpGet("submodels/{submodelId}/submodel/submodelElements/{seIdShortPath}", Name = "SubmodelRepo_GetSubmodelElementById")]
+
+        /// <inheritdoc cref="SubmodelController.GetSubmodelElementByPath(string, RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpGet(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "SubmodelRepo_GetSubmodelElementByPath")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 200)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_GetSubmodelElementById(string submodelId, string seIdShortPath)
+        public IActionResult SubmodelRepo_GetSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.GetSubmodelElementByIdShort(seIdShortPath);
+            return service.GetSubmodelElementByPath(idShortPath, level, content, extent);
         }
 
-        /// <summary>
-        /// Retrieves the value of a specific Submodel-Element from the Submodel
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="seIdShortPath">The Submodel-Element's IdShort-Path</param>
-        /// <returns></returns>
-        /// <response code="200">Returns the value of a specific Submodel-Element</response>
-        /// <response code="404">Submodel / Submodel-Element not found</response>  
-        /// <response code="405">Method not allowed</response>  
-        [HttpGet("submodels/{submodelId}/submodel/submodelElements/{seIdShortPath}/value", Name = "SubmodelRepo_GetSubmodelElementValueById")]
-        [Produces("application/json")]
-        [ProducesResponseType(typeof(object), 200)]
-        [ProducesResponseType(typeof(Result), 404)]
-        [ProducesResponseType(typeof(Result), 405)]
-        public IActionResult SubmodelRepo_GetSubmodelElementValueById(string submodelId, string seIdShortPath)
-        {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
-                return result;
-
-            var service = new SubmodelController(provider, hostingEnvironment);
-            return service.GetSubmodelElementValueByIdShort(seIdShortPath);
-        }
-
-        /// <summary>
-        /// Updates the Submodel-Element's value
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="seIdShortPath">The Submodel-Element's IdShort-Path</param>
-        /// <param name="value">The new value</param>
-        /// <returns></returns>
-        /// <response code="200">Submodel-Element's value changed successfully</response>
-        /// <response code="404">Submodel / Submodel-Element not found</response>     
-        /// <response code="405">Method not allowed</response>  
-        [HttpPut("submodels/{submodelId}/submodel/submodelElements/{seIdShortPath}/value", Name = "SubmodelRepo_PutSubmodelElementValueById")]
+        /// <inheritdoc cref="SubmodelController.PostSubmodelElementByPath(string, ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpPost(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "SubmodelRepo_PostSubmodelElementByPath")]
         [Produces("application/json")]
         [Consumes("application/json")]
-        [ProducesResponseType(typeof(ElementValue), 200)]
+        [ProducesResponseType(typeof(SubmodelElement), 201)]
+        [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_PutSubmodelElementValueById(string submodelId, string seIdShortPath, [FromBody] object value)
+        public IActionResult SubmodelRepo_PostSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromBody] ISubmodelElement submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.PutSubmodelElementValueByIdShort(seIdShortPath, value);
+            return service.PostSubmodelElementByPath(idShortPath, submodelElement, level, content, extent);
         }
 
-        /// <summary>
-        /// Deletes a specific Submodel-Element from the Submodel
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="seIdShortPath">The Submodel-Element's IdShort-Path</param>
-        /// <returns></returns>
-        /// <response code="204">Submodel-Element deleted successfully</response>
-        /// <response code="404">Submodel / Submodel-Element not found</response>
-        [HttpDelete("submodels/{submodelId}/submodel/submodelElements/{seIdShortPath}", Name = "SubmodelRepo_DeleteSubmodelElementById")]
+        /// <inheritdoc cref="SubmodelController.PutSubmodelElementByPath(string, JToken, RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpPut(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "SubmodelRepo_PutSubmodelElementByPath")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(Result), 200)]
-        public IActionResult SubmodelRepo_DeleteSubmodelElementById(string submodelId, string seIdShortPath)
+        [Consumes("application/json")]
+        [ProducesResponseType(typeof(SubmodelElement), 201)]
+        [ProducesResponseType(typeof(Result), 400)]
+        [ProducesResponseType(typeof(Result), 404)]
+        public IActionResult SubmodelRepo_PutSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromBody] JToken requestBody, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.DeleteSubmodelElementByIdShort(seIdShortPath);
+            return service.PutSubmodelElementByPath(idShortPath, requestBody, level, content, extent);
         }
 
-        /// <summary>
-        /// Uploads the actual file to the File-SubmodelElement
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="idShortPathToFile">The IdShort path to the File</param>
-        /// <param name="file">The actual File to upload</param>
-        /// <returns></returns>
-        /// <response code="200">File uploaded successfully</response>
-        /// <response code="400">Bad Request</response>
-        /// <response code="404">Submodel / Method handler not found</response>
-        [HttpPost("submodels/{submodelId}/submodel/submodelElements/{idShortPathToFile}/upload", Name = "SubmodelRepo_UploadFileContentByIdShort")]
+        /// <inheritdoc cref="SubmodelController.DeleteSubmodelElementByPath(string)"/>
+        [HttpDelete(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "SubmodelRepo_DeleteSubmodelElementByPath")]
+        [Produces("application/json")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(Result), 404)]
+        public IActionResult SubmodelRepo_DeleteSubmodelElementByPath(string submodelIdentifier, string idShortPath)
+        {
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
+                return result;
+
+            var service = new SubmodelController(provider, hostingEnvironment);
+            return service.DeleteSubmodelElementByPath(idShortPath);
+        }
+
+        /// <inheritdoc cref="SubmodelController.UploadFileContentByIdShort(string, IFormFile)"/>
+        [HttpPost(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH_UPLOAD, Name = "SubmodelRepo_UploadFileContentByIdShort")]
         [Produces("application/json")]
         [Consumes("multipart/form-data")]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public async Task<IActionResult> SubmodelRepo_UploadFileContentByIdShort(string submodelId, string idShortPathToFile, IFormFile file)
+        public async Task<IActionResult> SubmodelRepo_UploadFileContentByIdShort(string submodelIdentifier, string idShortPath, IFormFile file)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return await service.UploadFileContentByIdShort(idShortPathToFile, file);
+            return await service.UploadFileContentByIdShort(idShortPath, file);
         }
 
-        /// <summary>
-        /// Invokes a specific operation from the Submodel synchronously or asynchronously
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="idShortPathToOperation">The IdShort path to the Operation</param>
-        /// <param name="invocationRequest">The parameterized request object for the invocation</param>
-        /// <param name="async">Determines whether the execution of the operation is asynchronous (true) or not (false)</param>
-        /// <returns></returns>
-        /// <response code="200">Operation invoked successfully</response>
-        /// <response code="400">Bad Request</response>
-        /// <response code="404">Submodel / Method handler not found</response>
-        [HttpPost("submodels/{submodelId}/submodel/submodelElements/{idShortPathToOperation}/invoke", Name = "SubmodelRepo_InvokeOperationById")]
+        /// <inheritdoc cref="SubmodelController.InvokeOperation(string, JObject, bool, RequestContent)"/>
+        [HttpPost(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH_INVOKE, Name = "SubmodelRepo_InvokeOperation")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_InvokeOperationById(string submodelId, string idShortPathToOperation, [FromBody] JObject invocationRequest, [FromQuery] bool async)
+        public IActionResult SubmodelRepo_InvokeOperation(string submodelIdentifier, string idShortPath, [FromBody] JObject operationRequest, [FromQuery] bool async = false, [FromQuery] RequestContent content = default)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.InvokeOperationByIdShort(idShortPathToOperation, invocationRequest, async);
+            return service.InvokeOperation(idShortPath, operationRequest, async, content);
         }
 
-        /// <summary>
-        /// Retrieves the result of an asynchronously started operation
-        /// </summary>
-        /// <param name="submodelId">The Submodel's unique id</param>
-        /// <param name="idShortPathToOperation">The IdShort path to the Operation</param>
-        /// <param name="requestId">The request id</param>
-        /// <returns></returns>
-        /// <response code="200">Result found</response>
-        /// <response code="400">Bad Request</response>
-        /// <response code="404">Submodel / Operation / Request not found</response>
-        [HttpGet("submodels/{submodelId}/submodel/submodelElements/{idShortPathToOperation}/invocationList/{requestId}", Name = "SubmodelRepo_GetInvocationResultById")]
+        /// <inheritdoc cref="SubmodelController.GetOperationAsyncResult(string, string)"/>
+        [HttpGet(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH_OPERATION_RESULTS, Name = "SubmodelRepo_GetOperationAsyncResult")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(InvocationResponse), 200)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_GetInvocationResultById(string submodelId, string idShortPathToOperation, string requestId)
+        public IActionResult SubmodelRepo_GetOperationAsyncResult(string submodelIdentifier, string idShortPath, string handleId)
         {
-            if (serviceProvider.IsNullOrNotFound(submodelId, out IActionResult result, out ISubmodelServiceProvider provider))
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
 
             var service = new SubmodelController(provider, hostingEnvironment);
-            return service.GetInvocationResultByIdShort(idShortPathToOperation, requestId);
+            return service.GetOperationAsyncResult(idShortPath, handleId);
         }
         #endregion     
     }

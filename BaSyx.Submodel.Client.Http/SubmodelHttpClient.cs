@@ -102,7 +102,7 @@ namespace BaSyx.Submodel.Client.Http
             return result;
         }       
    
-        public IResult<ISubmodelElement> CreateOrUpdateSubmodelElement(string rootSubmodelElementIdShort, ISubmodelElement submodelElement)
+        public IResult<ISubmodelElement> UpdateSubmodelElement(string rootSubmodelElementIdShort, ISubmodelElement submodelElement)
         {
             var request = base.CreateJsonContentRequest(GetUri(SUBMODEL_ELEMENTS, rootSubmodelElementIdShort), HttpMethod.Put, submodelElement);
             var response = base.SendRequest(request, CancellationToken.None);
@@ -200,6 +200,11 @@ namespace BaSyx.Submodel.Client.Http
             var result = base.EvaluateResponse(response, response.Entity);
             response?.Entity?.Dispose();
             return result;
+        }
+
+        public IResult<ISubmodel> RetrieveSubmodel(RequestLevel level, RequestContent content, RequestExtent extent)
+        {
+            throw new NotImplementedException();
         }
     }
 }

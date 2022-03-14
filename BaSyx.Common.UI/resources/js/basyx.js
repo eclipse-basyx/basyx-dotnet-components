@@ -72,15 +72,15 @@ function ExecuteOperation(requestPath, className) {
                 var argOutIdShort = data.outputArguments[i].value.idShort;
                 $('#argOutValue_' + className + argOutIdShort).val(JSON.stringify(data.outputArguments[i].value.value));
             }           
-            if (data.operationResult.success) {
+            if (data.executionResult.success) {
                 $('#executeIcon_' + className).html('<i class="fas fa-check-circle"></i>');
                 setTimeout(() => $('#executeIcon_' + className).children("i:first").remove(), 5000);
             } else {
                 $('#executeIcon_' + className).html('<i class="fas fa-exclamation-triangle"></i>');
                 setTimeout(() => $('#executeIcon_' + className).children("i:first").remove(), 5000);
             }
-            if (data.operationResult.messages && data.operationResult.messages.length > 0) {
-                $('#messageInput_' + className).val(JSON.stringify(data.operationResult.messages));
+            if (data.executionResult.messages && data.executionResult.messages.length > 0) {
+                $('#messageInput_' + className).val(JSON.stringify(data.executionResult.messages));
             }            
         }
     });
@@ -90,7 +90,7 @@ function ExecuteOperation(requestPath, className) {
 function GetPropertyValue(requestPath, hashedPathIdInput) {
     $.ajax({
         type: 'GET',
-        url: requestPath + '/value',
+        url: requestPath + '?content=value',
         success: function (data) {
             $('#' + hashedPathIdInput).val(data);
             $('#' + hashedPathIdInput).css('border-color', 'green');
@@ -111,7 +111,7 @@ function SetPropertyValue(requestPath, hashedPathIdInput, value, valueType) {
     }
     $.ajax({
         type: 'PUT',
-        url: requestPath + '/value',
+        url: requestPath + '?content=value',
         contentType: 'application/json',
         data: JSON.stringify(value),
         error: function (jqXHR, errorType, exception) {

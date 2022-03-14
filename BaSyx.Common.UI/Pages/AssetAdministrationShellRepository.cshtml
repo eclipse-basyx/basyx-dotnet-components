@@ -12,7 +12,7 @@
     ServerSettings settings = Model.Settings;
 
     IEnumerable<IAssetAdministrationShellServiceProvider> shellServiceProviders = null;
-    var retrievedShellServiceProviders = sp.GetAssetAdministrationShellServiceProviders();
+    var retrievedShellServiceProviders = sp.ShellProviderRegistry.GetAssetAdministrationShellServiceProviders();
     if (retrievedShellServiceProviders.Success && retrievedShellServiceProviders.Entity != null)
     {
         shellServiceProviders = retrievedShellServiceProviders.Entity;
@@ -71,7 +71,7 @@
 
                     @{
                         IEnumerable<ISubmodelServiceProvider> submodelServiceProviders = null;
-                        var retrievedSubmodelServiceProvider = shellServiceProvider.SubmodelRegistry.GetSubmodelServiceProviders();
+                        var retrievedSubmodelServiceProvider = shellServiceProvider.SubmodelProviderRegistry.GetSubmodelServiceProviders();
                         if (retrievedSubmodelServiceProvider.Success && retrievedSubmodelServiceProvider.Entity != null)
                         {
                             submodelServiceProviders = retrievedSubmodelServiceProvider.Entity;

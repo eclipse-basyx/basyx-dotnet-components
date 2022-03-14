@@ -8,7 +8,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
-using BaSyx.API.Components;
+using BaSyx.API.Interfaces;
 using BaSyx.Utils.Settings.Types;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,11 +17,11 @@ namespace BaSyx.Common.UI.Pages
 {
     public class AssetAdministrationShellRegistryModel : PageModel
     {
-        public IAssetAdministrationShellRegistry ServiceProvider { get; }
+        public IAssetAdministrationShellRegistryInterface ServiceProvider { get; }
         public ServerSettings Settings { get; }
         public IHostingEnvironment HostingEnvironment { get; }
 
-        public AssetAdministrationShellRegistryModel(IAssetAdministrationShellRegistry provider, ServerSettings serverSettings, IHostingEnvironment hostingEnvironment)
+        public AssetAdministrationShellRegistryModel(IAssetAdministrationShellRegistryInterface provider, ServerSettings serverSettings, IHostingEnvironment hostingEnvironment)
         {
             ServiceProvider = provider;
             Settings = serverSettings;

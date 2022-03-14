@@ -1,19 +1,21 @@
 ﻿@page
 @model BaSyx.Common.UI.Pages.SubmodelRepositoryModel
 @using BaSyx.API.Components;
-@using BaSyx.Models.Core.AssetAdministrationShell.Generics; 
+@using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+@using BaSyx.Utils.Settings.Types;
 
 @{
     ISubmodelRepositoryServiceProvider sp = Model.ServiceProvider;
+    ServerSettings settings = Model.Settings;
 
     IEnumerable<ISubmodelServiceProvider> submodelServiceProviders = null;
     var retrievedSubmodelServiceProvider = sp.GetSubmodelServiceProviders();
     if (retrievedSubmodelServiceProvider.Success && retrievedSubmodelServiceProvider.Entity != null)
     {
         submodelServiceProviders = retrievedSubmodelServiceProvider.Entity;
-    }  
+    }
 
-    ViewData["Title"] = "Submodel Repository";
+    ViewData["Title"] = settings.UIConfig?.Title ?? "Submodel Repository";
     ViewData["ApiRoot"] = "/submodels";
     ViewData["ApiType"] = "SubmodelRepository";
     ViewData["aasId"] = string.Empty;

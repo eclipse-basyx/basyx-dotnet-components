@@ -2,28 +2,30 @@
 @model BaSyx.Common.UI.Pages.AssetAdministrationShellRepositoryModel
 @using BaSyx.API.Components;
 @using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+@using BaSyx.Utils.Settings.Types;
 @using System.Security.Cryptography;
 @using System.Text;
 @using System.Text.RegularExpressions;
 
 @{
     IAssetAdministrationShellRepositoryServiceProvider sp = Model.ServiceProvider;
+    ServerSettings settings = Model.Settings;
 
     IEnumerable<IAssetAdministrationShellServiceProvider> shellServiceProviders = null;
     var retrievedShellServiceProviders = sp.GetAssetAdministrationShellServiceProviders();
     if (retrievedShellServiceProviders.Success && retrievedShellServiceProviders.Entity != null)
     {
         shellServiceProviders = retrievedShellServiceProviders.Entity;
-    }  
+    }
 
-    ViewData["Title"] = "Asset Administration Shell Repository";
+    ViewData["Title"] = settings.UIConfig?.Title ?? "Asset Administration Shell Repository";
     ViewData["ApiRoot"] = "/shells";
     ViewData["ApiType"] = "AssetAdministrationShellRepository";
 }
 
 @functions
     {
-  
+
     private static string GetHashString(string input)
     {
         SHA256 shaAlgorithm = SHA256.Create();
@@ -45,7 +47,7 @@
     <h1>Asset Administration Shell Repository UI</h1>
     <p class="lead">Generic UI to display many Asset Administration Shells</p>
 </div>
-   
+
 
 @if (shellServiceProviders?.Count() > 0)
 {
@@ -64,7 +66,7 @@
                     @await Html.PartialAsync("_Identifier", aas.Identification)
                     @await Html.PartialAsync("_Description", aas.Description)
                 </ul>
-                <div class="card-body">                        
+                <div class="card-body">
                     @await Html.PartialAsync("_Asset", aas.Asset)
 
                     @{
@@ -81,7 +83,7 @@
                         foreach (var submodelServiceProvider in submodelServiceProviders)
                         {
                             ISubmodel submodel = submodelServiceProvider.GetBinding();
-                            @await Html.PartialAsync("_Submodel", submodel, new ViewDataDictionary(ViewData) { {"aasId",  aas.Identification.Id} })
+                            @await Html.PartialAsync("_Submodel", submodel, new ViewDataDictionary(ViewData) { { "aasId", aas.Identification.Id } })
                         }
                     }
                 </div>

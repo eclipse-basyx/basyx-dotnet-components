@@ -2,10 +2,11 @@
 @model BaSyx.Common.UI.Pages.AssetAdministrationShellModel
 @using BaSyx.API.Components;
 @using BaSyx.Models.Core.AssetAdministrationShell.Generics;
-
+@using BaSyx.Utils.Settings.Types;
 
 @{
     IAssetAdministrationShellServiceProvider sp = Model.ServiceProvider;
+    ServerSettings settings = Model.Settings;
 
     IEnumerable<ISubmodelServiceProvider> submodelServiceProviders = null;
     var retrievedSubmodelServiceProvider = sp.SubmodelRegistry.GetSubmodelServiceProviders();
@@ -16,10 +17,10 @@
 
     IAssetAdministrationShell aas = sp.GetBinding();
 
-    ViewData["Title"] = aas.IdShort;
+    ViewData["Title"] = settings.UIConfig?.Title ?? aas.IdShort;
     ViewData["ApiRoot"] = "/aas";
     ViewData["ApiType"] = "AssetAdministrationShell";
-    ViewData["aasId"] = aas.Identification.Id;    
+    ViewData["aasId"] = aas.Identification.Id;
 }
 
 

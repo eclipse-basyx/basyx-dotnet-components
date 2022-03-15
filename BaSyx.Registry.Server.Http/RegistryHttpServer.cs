@@ -10,7 +10,7 @@
 *******************************************************************************/
 using BaSyx.API.Interfaces;
 using BaSyx.Components.Common;
-using BaSyx.Utils.Settings.Types;
+using BaSyx.Utils.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

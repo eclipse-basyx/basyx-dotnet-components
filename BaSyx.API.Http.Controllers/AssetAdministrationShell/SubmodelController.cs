@@ -9,14 +9,12 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using Microsoft.AspNetCore.Mvc;
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+using BaSyx.Models.AdminShell;
 using BaSyx.Utils.ResultHandling;
-using BaSyx.API.Components;
+using BaSyx.API.ServiceProvider;
 using System;
 using Newtonsoft.Json.Linq;
 using BaSyx.Models.Extensions;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
-using BaSyx.Models.Communication;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -25,7 +23,6 @@ using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
 using BaSyx.Utils.DependencyInjection;
-using BaSyx.Models.Core.Common;
 
 namespace BaSyx.API.Http.Controllers
 {
@@ -339,7 +336,7 @@ namespace BaSyx.API.Http.Controllers
             if(!fileElementRetrieved.Success || fileElementRetrieved.Entity == null)
                 return fileElementRetrieved.CreateActionResult(CrudOperation.Retrieve);
 
-            IFile fileElement = fileElementRetrieved.Entity.Cast<IFile>();
+            IFileElement fileElement = fileElementRetrieved.Entity.Cast<IFileElement>();
             string fileName = fileElement.Value.TrimStart('/');
             string filePath = Path.Combine(hostingEnvironment.ContentRootPath, fileName);
             

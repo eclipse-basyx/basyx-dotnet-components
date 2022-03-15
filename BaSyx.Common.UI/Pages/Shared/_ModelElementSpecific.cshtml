@@ -1,8 +1,6 @@
 ﻿@model ISubmodelElement
-@using BaSyx.Models.Core.AssetAdministrationShell.Generics
-@using BaSyx.Models.Core.AssetAdministrationShell.Identification
+@using BaSyx.Models.AdminShell
 @using BaSyx.Models.Extensions
-@using BaSyx.Models.Core.Common
 @using Microsoft.AspNetCore.Hosting
 @inject IHostingEnvironment hostingEnvironment
 
@@ -69,7 +67,7 @@
             break;
         case KeyElements.File:
             {
-                IFile file = Model.Cast<IFile>();
+                IFileElement file = Model.Cast<IFileElement>();
                 if (file == null)
                 {
                     return;
@@ -276,7 +274,7 @@
 
 @functions
 {
-    public string GetPath(IFile file)
+    public string GetPath(IFileElement file)
     {
         string content = file.Value;
         if (string.IsNullOrEmpty(content))

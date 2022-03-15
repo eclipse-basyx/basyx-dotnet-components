@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
-using BaSyx.Utils.AssemblyHandling;
+using BaSyx.Utils.Assembly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 using BaSyx.Components.Common.Abstractions;

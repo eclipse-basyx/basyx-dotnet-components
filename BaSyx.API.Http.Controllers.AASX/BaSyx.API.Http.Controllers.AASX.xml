@@ -9,7 +9,7 @@
             The AASX Package Service
             </summary>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.#ctor(BaSyx.API.Components.IAssetAdministrationShellServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.#ctor(BaSyx.API.ServiceProvider.IAssetAdministrationShellServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             Constructor for the AASX-Package Services Controller
             </summary>

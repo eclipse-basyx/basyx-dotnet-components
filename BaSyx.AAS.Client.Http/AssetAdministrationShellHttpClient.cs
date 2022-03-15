@@ -9,25 +9,20 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using BaSyx.API.Clients;
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+using BaSyx.Models.AdminShell;
 using BaSyx.Utils.Client.Http;
 using BaSyx.Utils.ResultHandling;
 using System;
 using System.Net.Http;
-using BaSyx.Utils.PathHandling;
-using BaSyx.Models.Core.Common;
-using BaSyx.Models.Connectivity.Descriptors;
-using System.Linq;
+using BaSyx.Utils.FileSystem;
 using BaSyx.Models.Connectivity;
-using BaSyx.Models.Communication;
+using System.Linq;
 using BaSyx.Utils.DependencyInjection;
 using System.Collections.Generic;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using BaSyx.Models.Core.AssetAdministrationShell.Identification;
 
 namespace BaSyx.AAS.Client.Http
 {

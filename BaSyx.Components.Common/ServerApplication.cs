@@ -9,11 +9,11 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using BaSyx.Components.Common.Abstractions;
-using BaSyx.Utils.AssemblyHandling;
+using BaSyx.Utils.Assembly;
 using BaSyx.Utils.DependencyInjection;
-using BaSyx.Utils.JsonHandling;
+using BaSyx.Utils.Json;
 using BaSyx.Utils.ResultHandling;
-using BaSyx.Utils.Settings.Types;
+using BaSyx.Utils.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

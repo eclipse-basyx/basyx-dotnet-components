@@ -9,24 +9,21 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using BaSyx.API.Clients;
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+using BaSyx.Models.AdminShell;
 using BaSyx.Utils.Client.Http;
 using BaSyx.Utils.ResultHandling;
 using System;
 using System.Net.Http;
-using BaSyx.Models.Core.Common;
-using BaSyx.Models.Communication;
-using BaSyx.Utils.PathHandling;
-using BaSyx.Models.Connectivity.Descriptors;
+using BaSyx.Utils.FileSystem;
 using BaSyx.Models.Connectivity;
 using System.Linq;
 using BaSyx.Utils.DependencyInjection;
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using BaSyx.API.Http;
 
 namespace BaSyx.Submodel.Client.Http
 {
@@ -56,11 +53,7 @@ namespace BaSyx.Submodel.Client.Http
         { }
         public SubmodelHttpClient(Uri endpoint, HttpMessageHandler messageHandler) : this(messageHandler)
         {
-            endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
-            if (!endpoint.AbsolutePath.EndsWith(SUBMODEL))
-                Endpoint = new Uri(endpoint, SUBMODEL);
-            else
-                Endpoint = endpoint;
+            Endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));   
         }
         public SubmodelHttpClient(ISubmodelDescriptor submodelDescriptor) : this(submodelDescriptor, null)
         { }
@@ -77,13 +70,8 @@ namespace BaSyx.Submodel.Client.Http
 
             if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.Address))
                 throw new Exception("There is no http endpoint for instantiating a client");
-            else
-            {
-                if (!httpEndpoint.Address.EndsWith(SEPARATOR + SUBMODEL) && !httpEndpoint.Address.EndsWith(SEPARATOR + SUBMODEL + SEPARATOR))
-                    Endpoint = new Uri(httpEndpoint.Address + SEPARATOR + SUBMODEL);
-                else
-                    Endpoint = new Uri(httpEndpoint.Address);
-            }
+            
+            Endpoint = new Uri(httpEndpoint.Address.Replace(SubmodelRoutes.SUBMODEL, string.Empty));
         }
 
         public Uri GetUri(params string[] pathElements)
@@ -93,15 +81,26 @@ namespace BaSyx.Submodel.Client.Http
             return Endpoint.Append(pathElements);
         }
 
-        public IResult<ISubmodel> RetrieveSubmodel()
+        public IResult<ISubmodel> RetrieveSubmodel(RequestLevel level = default, RequestContent content = default, RequestExtent extent = default)
         {
-            var request = base.CreateRequest(GetUri(), HttpMethod.Get);
+            Uri uri = GetUri(SubmodelRoutes.SUBMODEL);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<ISubmodel>(response, response.Entity);
             response?.Entity?.Dispose();
             return result;
-        }       
-   
+        }
+
+        public IResult UpdateSubmodel(ISubmodel submodel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IResult<ISubmodelElement> CreateSubmodelElement(string idShortPath, ISubmodelElement submodelElement)
+        {
+            throw new NotImplementedException();
+        }
+
         public IResult<ISubmodelElement> UpdateSubmodelElement(string rootSubmodelElementIdShort, ISubmodelElement submodelElement)
         {
             var request = base.CreateJsonContentRequest(GetUri(SUBMODEL_ELEMENTS, rootSubmodelElementIdShort), HttpMethod.Put, submodelElement);
@@ -200,11 +199,6 @@ namespace BaSyx.Submodel.Client.Http
             var result = base.EvaluateResponse(response, response.Entity);
             response?.Entity?.Dispose();
             return result;
-        }
-
-        public IResult<ISubmodel> RetrieveSubmodel(RequestLevel level, RequestContent content, RequestExtent extent)
-        {
-            throw new NotImplementedException();
         }
     }
 }

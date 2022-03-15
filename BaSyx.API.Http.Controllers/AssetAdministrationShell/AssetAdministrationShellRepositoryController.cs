@@ -11,17 +11,13 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
-using BaSyx.Models.Core.AssetAdministrationShell.Generics;
+using BaSyx.Models.AdminShell;
 using BaSyx.Utils.ResultHandling;
-using BaSyx.API.Components;
-using BaSyx.Models.Core.AssetAdministrationShell.Implementations;
-using BaSyx.Models.Communication;
+using BaSyx.API.ServiceProvider;
 using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
-using BaSyx.Models.Core.Common;
-using BaSyx.Models.Core.AssetAdministrationShell.Identification;
 
 namespace BaSyx.API.Http.Controllers
 {
@@ -70,7 +66,7 @@ namespace BaSyx.API.Http.Controllers
         /// <response code="200">Requested Asset Administration Shells</response>
         [HttpGet(AssetAdministrationShellRepositoryRoutes.SHELLS, Name = "GetAllAssetAdministrationShells")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(List<BaSyx.Models.Core.AssetAdministrationShell.Implementations.AssetAdministrationShell>), 200)]
+        [ProducesResponseType(typeof(List<BaSyx.Models.AdminShell.AssetAdministrationShell>), 200)]
         public IActionResult GetAllAssetAdministrationShells([FromQuery] string idShort = null, [FromQuery] List<string> assetIds = null)
         {
             var result = serviceProvider.RetrieveAssetAdministrationShells();
@@ -87,7 +83,7 @@ namespace BaSyx.API.Http.Controllers
         [HttpPost(AssetAdministrationShellRepositoryRoutes.SHELLS, Name = "PostAssetAdministrationShell")]
         [Produces("application/json")]
         [Consumes("application/json")]
-        [ProducesResponseType(typeof(BaSyx.Models.Core.AssetAdministrationShell.Implementations.AssetAdministrationShell), 201)]
+        [ProducesResponseType(typeof(BaSyx.Models.AdminShell.AssetAdministrationShell), 201)]
         public IActionResult PostAssetAdministrationShell([FromBody] IAssetAdministrationShell aas)
         {
             if (aas == null)
@@ -109,7 +105,7 @@ namespace BaSyx.API.Http.Controllers
         /// <response code="404">No Asset Administration Shell found</response>           
         [HttpGet(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS, Name = "GetAssetAdministrationShellById")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(BaSyx.Models.Core.AssetAdministrationShell.Implementations.AssetAdministrationShell), 200)]
+        [ProducesResponseType(typeof(BaSyx.Models.AdminShell.AssetAdministrationShell), 200)]
         public IActionResult GetAssetAdministrationShellById(string aasIdentifier)
         {
             if (string.IsNullOrEmpty(aasIdentifier))
@@ -132,7 +128,7 @@ namespace BaSyx.API.Http.Controllers
         [HttpPut(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS, Name = "PutAssetAdministrationShellById")]
         [Produces("application/json")]
         [Consumes("application/json")]
-        [ProducesResponseType(typeof(BaSyx.Models.Core.AssetAdministrationShell.Implementations.AssetAdministrationShell), 201)]
+        [ProducesResponseType(typeof(BaSyx.Models.AdminShell.AssetAdministrationShell), 201)]
         public IActionResult PutAssetAdministrationShellById(string aasIdentifier, [FromBody] IAssetAdministrationShell aas)
         {
             if (string.IsNullOrEmpty(aasIdentifier))

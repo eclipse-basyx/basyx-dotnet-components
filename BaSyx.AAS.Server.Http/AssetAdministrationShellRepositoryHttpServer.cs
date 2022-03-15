@@ -8,9 +8,9 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
-using BaSyx.API.Components;
+using BaSyx.API.ServiceProvider;
 using BaSyx.Components.Common;
-using BaSyx.Utils.Settings.Types;
+using BaSyx.Utils.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

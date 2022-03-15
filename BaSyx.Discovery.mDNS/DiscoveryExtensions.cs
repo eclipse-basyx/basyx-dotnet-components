@@ -9,9 +9,8 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using BaSyx.AAS.Client.Http;
-using BaSyx.API.Components;
+using BaSyx.API.ServiceProvider;
 using BaSyx.Models.Connectivity;
-using BaSyx.Models.Connectivity.Descriptors;
 using BaSyx.Utils.ResultHandling;
 using System;
 using System.Collections.Generic;

@@ -9,8 +9,8 @@
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
 using BaSyx.API.Interfaces;
-using BaSyx.Models.Connectivity.Descriptors;
-using BaSyx.Models.Core.Common;
+using BaSyx.Models.Connectivity;
+using BaSyx.Models.AdminShell;
 using BaSyx.Utils.Client.Http;
 using BaSyx.Utils.DependencyInjection;
 using BaSyx.Utils.ResultHandling;

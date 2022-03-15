@@ -8,8 +8,8 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
-using BaSyx.API.Components;
-using BaSyx.Models.Connectivity.Descriptors;
+using BaSyx.API.ServiceProvider;
+using BaSyx.Models.Connectivity;
 using BaSyx.Utils.ResultHandling;
 using System;
 using System.Threading;

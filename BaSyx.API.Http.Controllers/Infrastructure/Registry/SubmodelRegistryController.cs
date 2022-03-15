@@ -66,8 +66,7 @@ namespace BaSyx.API.Http.Controllers
             if (submodelDescriptor.Identification == null || string.IsNullOrEmpty(submodelDescriptor.Identification.Id))
                 return ResultHandling.NullResult("The identification property of the Submodel Descriptor is null or empty");
 
-            //ToDo
-            string submodelId = submodelDescriptor.Identification.Id;
+            string submodelId = ResultHandling.Base64UrlEncode(submodelDescriptor.Identification.Id);
 
             var result = serviceProvider.CreateSubmodelRegistration(submodelDescriptor);
             return result.CreateActionResult(CrudOperation.Create, SubmodelRegistryRoutes.SUBMODEL_DESCRIPTOR_ID.Replace("{submodelIdentifier}", submodelId));
@@ -97,6 +96,8 @@ namespace BaSyx.API.Http.Controllers
             if (submodelDescriptor.Identification == null || string.IsNullOrEmpty(submodelDescriptor.Identification.Id))
                 return ResultHandling.NullResult("The identification property of the Submodel Descriptor is null or empty");
 
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
+
             var result = serviceProvider.UpdateSubmodelRegistration(submodelIdentifier, submodelDescriptor);
             return result.CreateActionResult(CrudOperation.Update);
         }
@@ -116,13 +117,15 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(submodelIdentifier))
                 return ResultHandling.NullResult(nameof(submodelIdentifier));
 
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
+
             var result = serviceProvider.RetrieveSubmodelRegistration(submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
         }
         /// <summary>
         /// Deletes a Submodel Descriptor, i.e. de-registers a submodel
         /// </summary>
-        /// <param name="submodelId">The Submodel’s unique id (BASE64-URL-encoded)</param>
+        /// <param name="submodelIdentifier">The Submodel’s unique id (BASE64-URL-encoded)</param>
         /// <returns></returns>
         /// <response code="204">Submodel Descriptor deleted successfully</response>
         /// <response code="404">No Submodel descriptor with passed id found</response>  
@@ -130,12 +133,14 @@ namespace BaSyx.API.Http.Controllers
         [Produces("application/json")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult DeleteSubmodelDescriptorById(string submodelId)
+        public IActionResult DeleteSubmodelDescriptorById(string submodelIdentifier)
         {
-            if (string.IsNullOrEmpty(submodelId))
-                return ResultHandling.NullResult(nameof(submodelId));
+            if (string.IsNullOrEmpty(submodelIdentifier))
+                return ResultHandling.NullResult(nameof(submodelIdentifier));
 
-            var result = serviceProvider.DeleteSubmodelRegistration(submodelId);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
+
+            var result = serviceProvider.DeleteSubmodelRegistration(submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Delete);
         }
     }

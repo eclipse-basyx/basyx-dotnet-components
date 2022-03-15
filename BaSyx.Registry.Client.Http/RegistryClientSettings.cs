@@ -15,15 +15,14 @@ namespace BaSyx.Registry.Client.Http
 {
     public class RegistryClientSettings : Settings<RegistryClientSettings>
     {        
-        public RegistryConfiguration RegistryConfig { get; set; } = new RegistryConfiguration();
-     
-        public class RegistryConfiguration 
-        {
-            [XmlElement]
-            public string RegistryUrl { get; set; }
-            [XmlElement]
-            public string RegisterAtAAS { get; set; }
-        }
-       
+        public RegistryConfiguration RegistryConfig { get; set; } = new RegistryConfiguration();      
+    }
+
+    public class RegistryConfiguration
+    {
+        [XmlElement]
+        public string RegistryUrl { get; set; }
+        [XmlElement]
+        public string RegisterAtAAS { get; set; }
     }
 }

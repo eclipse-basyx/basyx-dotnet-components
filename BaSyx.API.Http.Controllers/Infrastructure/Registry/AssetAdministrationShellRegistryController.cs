@@ -64,8 +64,7 @@ namespace BaSyx.API.Http.Controllers
             if (aasDescriptor.Identification == null || string.IsNullOrEmpty(aasDescriptor.Identification.Id))
                 return ResultHandling.NullResult("The identification property of the Asset Administration Shell Descriptor is null or empty");
 
-            //ToDo: Base 64url encode
-            string aasId = aasDescriptor.Identification.Id;
+            string aasId = ResultHandling.Base64UrlEncode(aasDescriptor.Identification.Id);
 
             var result = serviceProvider.CreateAssetAdministrationShellRegistration(aasDescriptor);
             return result.CreateActionResult(CrudOperation.Create, AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID.Replace("{aasIdentifier}", aasId));
@@ -86,7 +85,7 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(aasIdentifier))
                 return ResultHandling.NullResult(nameof(aasIdentifier));
 
-            aasIdentifier = HttpUtility.UrlDecode(aasIdentifier);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
             var result = serviceProvider.RetrieveAssetAdministrationShellRegistration(aasIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
         }
@@ -113,7 +112,7 @@ namespace BaSyx.API.Http.Controllers
             if(aasDescriptor.Identification == null || string.IsNullOrEmpty(aasDescriptor.Identification.Id))
                 return ResultHandling.NullResult("The identification property of the Asset Administration Shell Descriptor is null or empty");
 
-            aasIdentifier = HttpUtility.UrlDecode(aasIdentifier);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
 
             if (aasIdentifier != aasDescriptor.Identification.Id)
                 return ResultHandling.BadRequestResult($"Path parameter {aasIdentifier} does not equal Asset Administration Shell Descriptor identification property {aasDescriptor.Identification.Id}");
@@ -138,7 +137,7 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(aasIdentifier))
                 return ResultHandling.NullResult(nameof(aasIdentifier));
 
-            aasIdentifier = HttpUtility.UrlDecode(aasIdentifier);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
             var result = serviceProvider.DeleteAssetAdministrationShellRegistration(aasIdentifier);
             return result.CreateActionResult(CrudOperation.Delete);
         }
@@ -151,6 +150,7 @@ namespace BaSyx.API.Http.Controllers
         [ProducesResponseType(typeof(List<SubmodelDescriptor>), 200)]
         public IActionResult ShellRegistry_GetAllSubmodelDescriptors(string aasIdentifier)
         {
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
             var result = serviceProvider.RetrieveAllSubmodelRegistrations(aasIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
         }
@@ -168,8 +168,8 @@ namespace BaSyx.API.Http.Controllers
             if (submodelDescriptor.Identification == null || string.IsNullOrEmpty(submodelDescriptor.Identification.Id))
                 return ResultHandling.NullResult("The identification property of the Submodel Descriptor is null or empty");
 
-            //ToDo
-            string submodelId = submodelDescriptor.Identification.Id;
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
+            string submodelId = ResultHandling.Base64UrlEncode(submodelDescriptor.Identification.Id);
 
             var result = serviceProvider.CreateSubmodelRegistration(aasIdentifier, submodelDescriptor);
             return result.CreateActionResult(CrudOperation.Create, SubmodelRegistryRoutes.SUBMODEL_DESCRIPTOR_ID.Replace("{submodelIdentifier}", submodelId));
@@ -191,6 +191,9 @@ namespace BaSyx.API.Http.Controllers
             if (submodelDescriptor.Identification == null || string.IsNullOrEmpty(submodelDescriptor.Identification.Id))
                 return ResultHandling.NullResult("The identification property of the Submodel Descriptor is null or empty");
 
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
+
             var result = serviceProvider.UpdateSubmodelRegistration(aasIdentifier, submodelIdentifier, submodelDescriptor);
             return result.CreateActionResult(CrudOperation.Update);
         }
@@ -204,6 +207,9 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(submodelIdentifier))
                 return ResultHandling.NullResult(nameof(submodelIdentifier));
 
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
+
             var result = serviceProvider.RetrieveSubmodelRegistration(aasIdentifier, submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
         }
@@ -213,12 +219,15 @@ namespace BaSyx.API.Http.Controllers
         [Produces("application/json")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult ShellRegistry_DeleteSubmodelDescriptorById(string aasIdentifier, string submodelId)
+        public IActionResult ShellRegistry_DeleteSubmodelDescriptorById(string aasIdentifier, string submodelIdentifier)
         {
-            if (string.IsNullOrEmpty(submodelId))
-                return ResultHandling.NullResult(nameof(submodelId));
+            if (string.IsNullOrEmpty(submodelIdentifier))
+                return ResultHandling.NullResult(nameof(submodelIdentifier));
 
-            var result = serviceProvider.DeleteSubmodelRegistration(aasIdentifier, submodelId);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
+
+            var result = serviceProvider.DeleteSubmodelRegistration(aasIdentifier, submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Delete);
         }
 

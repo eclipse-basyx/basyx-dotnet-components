@@ -582,7 +582,7 @@
             <summary>
             Deletes a Submodel Descriptor, i.e. de-registers a submodel
             </summary>
-            <param name="submodelId">The Submodel’s unique id (BASE64-URL-encoded)</param>
+            <param name="submodelIdentifier">The Submodel’s unique id (BASE64-URL-encoded)</param>
             <returns></returns>
             <response code="204">Submodel Descriptor deleted successfully</response>
             <response code="404">No Submodel descriptor with passed id found</response>  

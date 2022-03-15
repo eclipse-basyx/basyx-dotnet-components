@@ -22,6 +22,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using BaSyx.API.Http;
+using BaSyx.Utils.Extensions;
 
 namespace BaSyx.Registry.Client.Http
 {
@@ -45,7 +47,7 @@ namespace BaSyx.Registry.Client.Http
             if (settings.ClientConfig.RequestConfig.RequestTimeout.HasValue)
                 SetDefaultTimeout(TimeSpan.FromMilliseconds(settings.ClientConfig.RequestConfig.RequestTimeout.Value));
 
-            baseUrl = settings.RegistryConfig.RegistryUrl.TrimEnd('/') + PATH_SEPERATOR + REGISTRY_BASE_PATH;
+            baseUrl = settings.RegistryConfig.RegistryUrl.TrimEnd('/');
         }
 
         public RegistryHttpClient() : this(null, null)
@@ -59,17 +61,24 @@ namespace BaSyx.Registry.Client.Http
             LoadSettings(Settings);
         }
 
-        public Uri GetUri(params string[] pathElements)
+        public Uri GetPath(string requestPath, string aasId = null, string submodelId = null)
         {
             string path = baseUrl;
 
-            if (pathElements?.Length > 0)
-                foreach (var pathElement in pathElements)
-                {
-                    string encodedPathElement = HttpUtility.UrlEncode(pathElement);
-                    path = path.TrimEnd('/') + PATH_SEPERATOR + encodedPathElement.TrimEnd('/');
-                }
-            return new Uri(path);
+            if (string.IsNullOrEmpty(requestPath))
+                return new Uri(path);
+
+            if(!string.IsNullOrEmpty(aasId))
+            {
+                requestPath = requestPath.Replace("{aasIdentifier}", aasId.Base64UrlEncode());
+            }
+
+            if (!string.IsNullOrEmpty(submodelId))
+            {
+                requestPath = requestPath.Replace("{submodelIdentifier}", submodelId.Base64UrlEncode());
+            }
+
+            return new Uri(path + requestPath);
         }
 
         public void RepeatRegistration(IAssetAdministrationShellDescriptor aasDescriptor, TimeSpan interval, CancellationTokenSource cancellationToken)
@@ -96,7 +105,8 @@ namespace BaSyx.Registry.Client.Http
             if (aasDescriptor == null)
                 return new Result<IAssetAdministrationShellDescriptor>(new ArgumentNullException(nameof(aasDescriptor)));
 
-            var request = base.CreateJsonContentRequest(GetUri(), HttpMethod.Post, aasDescriptor);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTORS);
+            var request = base.CreateJsonContentRequest(uri, HttpMethod.Post, aasDescriptor);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IAssetAdministrationShellDescriptor>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -110,7 +120,8 @@ namespace BaSyx.Registry.Client.Http
             if (aasDescriptor == null)
                 return new Result<IAssetAdministrationShellDescriptor>(new ArgumentNullException(nameof(aasDescriptor)));
 
-            var request = base.CreateJsonContentRequest(GetUri(aasId), HttpMethod.Put, aasDescriptor);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID, aasId);
+            var request = base.CreateJsonContentRequest(uri, HttpMethod.Put, aasDescriptor);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IAssetAdministrationShellDescriptor>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -122,7 +133,8 @@ namespace BaSyx.Registry.Client.Http
             if (string.IsNullOrEmpty(aasId))
                 return new Result<IAssetAdministrationShellDescriptor>(new ArgumentNullException(nameof(aasId)));
 
-            var request = base.CreateRequest(GetUri(aasId), HttpMethod.Get);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID, aasId);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IAssetAdministrationShellDescriptor>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -134,7 +146,8 @@ namespace BaSyx.Registry.Client.Http
             if (predicate == null)
                 return new Result<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>(new ArgumentNullException(nameof(predicate)));
 
-            var request = base.CreateRequest(GetUri(), HttpMethod.Get);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTORS);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IEnumerable<IAssetAdministrationShellDescriptor>>(response, response.Entity);
 
@@ -153,7 +166,8 @@ namespace BaSyx.Registry.Client.Http
 
         public IResult<IQueryableElementContainer<IAssetAdministrationShellDescriptor>> RetrieveAllAssetAdministrationShellRegistrations()
         {
-            var request = base.CreateRequest(GetUri(), HttpMethod.Get);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTORS);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IEnumerable<IAssetAdministrationShellDescriptor>>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -165,7 +179,8 @@ namespace BaSyx.Registry.Client.Http
             if (string.IsNullOrEmpty(aasId))
                 return new Result(new ArgumentNullException(nameof(aasId)));
 
-            var request = base.CreateRequest(GetUri(aasId), HttpMethod.Delete);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID, aasId);
+            var request = base.CreateRequest(uri, HttpMethod.Delete);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse(response, response.Entity);
             response?.Entity?.Dispose();
@@ -179,7 +194,8 @@ namespace BaSyx.Registry.Client.Http
             if (submodelDescriptor == null)
                 return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(submodelDescriptor)));
 
-            var request = base.CreateJsonContentRequest(GetUri(aasId, SUBMODEL_PATH), HttpMethod.Post, submodelDescriptor);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTORS, aasId);
+            var request = base.CreateJsonContentRequest(uri, HttpMethod.Post, submodelDescriptor);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<ISubmodelDescriptor>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -195,7 +211,8 @@ namespace BaSyx.Registry.Client.Http
             if (submodelDescriptor == null)
                 return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(submodelDescriptor)));
 
-            var request = base.CreateJsonContentRequest(GetUri(aasId, SUBMODEL_PATH, submodelId), HttpMethod.Put, submodelDescriptor);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTOR_ID, aasId, submodelId);
+            var request = base.CreateJsonContentRequest(uri, HttpMethod.Put, submodelDescriptor);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<ISubmodelDescriptor>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -209,7 +226,8 @@ namespace BaSyx.Registry.Client.Http
             if (predicate == null)
                 return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(new ArgumentNullException(nameof(predicate)));
 
-            var request = base.CreateRequest(GetUri(aasId, SUBMODEL_PATH), HttpMethod.Get);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTORS, aasId);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IEnumerable<ISubmodelDescriptor>>(response, response.Entity);
 
@@ -231,7 +249,8 @@ namespace BaSyx.Registry.Client.Http
             if (string.IsNullOrEmpty(aasId))
                 return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(new ArgumentNullException(nameof(aasId)));
 
-            var request = base.CreateRequest(GetUri(aasId, SUBMODEL_PATH), HttpMethod.Get);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTORS, aasId);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<IEnumerable<ISubmodelDescriptor>>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -245,7 +264,8 @@ namespace BaSyx.Registry.Client.Http
             if (string.IsNullOrEmpty(submodelId))
                 return new Result<ISubmodelDescriptor>(new ArgumentNullException(nameof(submodelId)));
 
-            var request = base.CreateRequest(GetUri(aasId, SUBMODEL_PATH, submodelId), HttpMethod.Get);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTOR_ID, aasId, submodelId);
+            var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse<ISubmodelDescriptor>(response, response.Entity);
             response?.Entity?.Dispose();
@@ -259,7 +279,8 @@ namespace BaSyx.Registry.Client.Http
             if (string.IsNullOrEmpty(submodelId))
                 return new Result(new ArgumentNullException(nameof(submodelId)));
 
-            var request = base.CreateRequest(GetUri(aasId, SUBMODEL_PATH, submodelId), HttpMethod.Delete);
+            Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTOR_ID, aasId, submodelId);
+            var request = base.CreateRequest(uri, HttpMethod.Delete);
             var response = base.SendRequest(request, CancellationToken.None);
             var result = base.EvaluateResponse(response, response.Entity);
             response?.Entity?.Dispose();

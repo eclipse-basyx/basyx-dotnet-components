@@ -422,6 +422,12 @@
             <returns></returns>
             <response code="200">Submodel deleted successfully</response>
         </member>
+        <member name="M:BaSyx.API.Http.Controllers.SubmodelRepositoryController.SubmodelRepo_GetSubmodel(System.String,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)">
+            <inheritdoc cref="M:BaSyx.API.Http.Controllers.SubmodelController.GetSubmodel(BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)"/>
+        </member>
+        <member name="M:BaSyx.API.Http.Controllers.SubmodelRepositoryController.SubmodelRepo_PutSubmodel(System.String,BaSyx.Models.AdminShell.Submodel,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)">
+            <inheritdoc cref="M:BaSyx.API.Http.Controllers.SubmodelController.PutSubmodel(BaSyx.Models.AdminShell.ISubmodel,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)"/>
+        </member>
         <member name="M:BaSyx.API.Http.Controllers.SubmodelRepositoryController.SubmodelRepo_GetAllSubmodelElements(System.String,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)">
             <inheritdoc cref="M:BaSyx.API.Http.Controllers.SubmodelController.GetAllSubmodelElements(BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)"/>
         </member>

@@ -1,5 +1,6 @@
 ﻿@page
 @model BaSyx.Common.UI.Pages.AssetAdministrationShellRepositoryModel
+@using BaSyx.API.Http
 @using BaSyx.API.ServiceProvider;
 @using BaSyx.Models.AdminShell;
 @using BaSyx.Utils.Settings;
@@ -19,7 +20,7 @@
     }
 
     ViewData["Title"] = settings.UIConfig?.Title ?? "Asset Administration Shell Repository";
-    ViewData["ApiRoot"] = "/shells";
+    ViewData["ApiRoot"] = AssetAdministrationShellRepositoryRoutes.SHELLS;
     ViewData["ApiType"] = "AssetAdministrationShellRepository";
 }
 

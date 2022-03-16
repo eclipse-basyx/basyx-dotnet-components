@@ -1,5 +1,6 @@
 ﻿@page
 @model BaSyx.Common.UI.Pages.SubmodelModel
+@using BaSyx.API.Http
 @using BaSyx.API.ServiceProvider;
 @using BaSyx.Models.AdminShell;
 @using BaSyx.Utils.Settings;
@@ -10,7 +11,7 @@
     ISubmodel submodel = sp.GetBinding();
 
     ViewData["Title"] = settings.UIConfig?.Title ?? submodel.IdShort;
-    ViewData["ApiRoot"] = "/submodel";
+    ViewData["ApiRoot"] = SubmodelRoutes.SUBMODEL;
     ViewData["ApiType"] = "Submodel";
     ViewData["aasId"] = string.Empty;
 }

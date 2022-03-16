@@ -1,5 +1,6 @@
 ﻿@page
 @model BaSyx.Common.UI.Pages.AssetAdministrationShellModel
+@using BaSyx.API.Http
 @using BaSyx.API.ServiceProvider;
 @using BaSyx.Models.AdminShell;
 @using BaSyx.Utils.Settings;
@@ -18,7 +19,7 @@
     IAssetAdministrationShell aas = sp.GetBinding();
 
     ViewData["Title"] = settings.UIConfig?.Title ?? aas.IdShort;
-    ViewData["ApiRoot"] = "/aas";
+    ViewData["ApiRoot"] = AssetAdministrationShellRoutes.AAS;
     ViewData["ApiType"] = "AssetAdministrationShell";
     ViewData["aasId"] = aas.Identification.Id;
 }

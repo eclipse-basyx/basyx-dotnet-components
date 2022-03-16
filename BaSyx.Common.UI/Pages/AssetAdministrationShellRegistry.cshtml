@@ -1,5 +1,6 @@
 ﻿@page
 @model BaSyx.Common.UI.Pages.AssetAdministrationShellRegistryModel
+@using BaSyx.API.Http
 @using BaSyx.API.Interfaces;
 @using BaSyx.Models.Connectivity;
 @using BaSyx.Models.AdminShell;
@@ -20,7 +21,7 @@
     }
 
     ViewData["Title"] = settings.UIConfig?.Title ?? "BaSyx Registry UI";
-    ViewData["ApiRoot"] = "/api/v1/registry";
+    ViewData["ApiRoot"] = AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTORS;
 }
 
 @functions

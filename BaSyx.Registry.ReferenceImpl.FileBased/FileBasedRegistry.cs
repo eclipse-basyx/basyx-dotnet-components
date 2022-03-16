@@ -38,6 +38,8 @@ namespace BaSyx.Registry.ReferenceImpl.FileBased
             JsonSerializerSettings = new DependencyInjectionJsonSerializerSettings();
 
             FolderPath = Settings.Miscellaneous["FolderPath"];
+            if (!Path.IsPathRooted(FolderPath))
+                FolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, FolderPath);
 
             if (string.IsNullOrEmpty(FolderPath))
             {

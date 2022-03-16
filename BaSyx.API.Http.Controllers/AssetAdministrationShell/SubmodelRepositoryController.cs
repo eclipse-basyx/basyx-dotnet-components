@@ -88,8 +88,7 @@ namespace BaSyx.API.Http.Controllers
             if (submodel == null)
                 return ResultHandling.NullResult(nameof(submodel));
 
-            //ToDo: URL-Encoded Base64
-            string submodelId = submodel.Identification.Id;
+            string submodelId = ResultHandling.Base64UrlEncode(submodel.Identification.Id);
 
             var result = serviceProvider.CreateSubmodel(submodel);
             return result.CreateActionResult(CrudOperation.Create, SubmodelRepositoryRoutes.SUBMODELS + "/ " + submodelId);
@@ -110,7 +109,7 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(submodelIdentifier))
                 return ResultHandling.NullResult(nameof(submodelIdentifier));
 
-            submodelIdentifier = HttpUtility.UrlDecode(submodelIdentifier);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
 
             var result = serviceProvider.RetrieveSubmodel(submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
@@ -135,7 +134,7 @@ namespace BaSyx.API.Http.Controllers
             if (submodel == null)
                 return ResultHandling.NullResult(nameof(submodel));
 
-            submodelIdentifier = HttpUtility.UrlDecode(submodelIdentifier);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
 
             if (submodelIdentifier != submodel.Identification.Id)
             {
@@ -164,13 +163,41 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(submodelIdentifier))
                 return ResultHandling.NullResult(nameof(submodelIdentifier));
 
-            submodelIdentifier = HttpUtility.UrlDecode(submodelIdentifier);
+            submodelIdentifier = ResultHandling.Base64UrlDecode(submodelIdentifier);
 
             var result = serviceProvider.DeleteSubmodel(submodelIdentifier);
             return result.CreateActionResult(CrudOperation.Delete);
         }
 
         #region Submodel Interface
+
+        /// <inheritdoc cref="SubmodelController.GetSubmodel(RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpGet(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL, Name = "SubmodelRepo_GetSubmodel")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(Submodel), 200)]
+        [ProducesResponseType(typeof(Result), 404)]
+        public IActionResult SubmodelRepo_GetSubmodel(string submodelIdentifier, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        {
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
+                return result;
+
+            var service = new SubmodelController(provider, hostingEnvironment);
+            return service.GetSubmodel(level, content, extent);
+        }
+
+        /// <inheritdoc cref="SubmodelController.PutSubmodel(ISubmodel, RequestLevel, RequestContent, RequestExtent)"/>
+        [HttpPut(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL, Name = "SubmodelRepo_PutSubmodel")]
+        [Produces("application/json")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(Result), 404)]
+        public IActionResult SubmodelRepo_PutSubmodel(string submodelIdentifier, [FromBody] Submodel submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        {
+            if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
+                return result;
+
+            var service = new SubmodelController(provider, hostingEnvironment);
+            return service.PutSubmodel(submodel, level, content, extent);
+        }
 
         /// <inheritdoc cref="SubmodelController.GetAllSubmodelElements(RequestLevel, RequestContent, RequestExtent)"/>
         [HttpGet(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS, Name = "SubmodelRepo_GetAllSubmodelElements")]

@@ -89,8 +89,7 @@ namespace BaSyx.API.Http.Controllers
             if (aas == null)
                 return ResultHandling.NullResult(nameof(aas));
 
-            //ToDo Base64URL
-            string aasIdentifier = aas.Identification.Id;
+            string aasIdentifier = ResultHandling.Base64UrlEncode(aas.Identification.Id);
 
             var result = serviceProvider.CreateAssetAdministrationShell(aas);
             return result.CreateActionResult(CrudOperation.Create, AssetAdministrationShellRepositoryRoutes.SHELLS_AAS.Replace("{aasIdentifier}", aasIdentifier));
@@ -111,7 +110,7 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(aasIdentifier))
                 return ResultHandling.NullResult(nameof(aasIdentifier));
 
-            aasIdentifier = HttpUtility.UrlDecode(aasIdentifier);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
 
             var result = serviceProvider.RetrieveAssetAdministrationShell(aasIdentifier);
             return result.CreateActionResult(CrudOperation.Retrieve);
@@ -136,7 +135,7 @@ namespace BaSyx.API.Http.Controllers
             if (aas == null)
                 return ResultHandling.NullResult(nameof(aas));
 
-            aasIdentifier = HttpUtility.UrlDecode(aasIdentifier);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
 
             if (aasIdentifier != aas.Identification.Id)
             {
@@ -165,7 +164,7 @@ namespace BaSyx.API.Http.Controllers
             if (string.IsNullOrEmpty(aasIdentifier))
                 return ResultHandling.NullResult(nameof(aasIdentifier));
 
-            aasIdentifier = HttpUtility.UrlDecode(aasIdentifier);
+            aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
 
             var result = serviceProvider.DeleteAssetAdministrationShell(aasIdentifier);
             return result.CreateActionResult(CrudOperation.Delete);            

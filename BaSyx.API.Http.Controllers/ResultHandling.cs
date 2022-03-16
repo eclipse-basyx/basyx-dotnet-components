@@ -94,7 +94,7 @@ namespace BaSyx.API.Http.Controllers
                 provider = null;
                 return true;
             }
-            aasId = HttpUtility.UrlDecode(aasId);
+            aasId = Base64UrlDecode(aasId);
             var retrievedProvider = serviceProvider.ShellProviderRegistry.GetAssetAdministrationShellServiceProvider(aasId);
             if (retrievedProvider.TryGetEntity(out provider))
             {
@@ -125,7 +125,7 @@ namespace BaSyx.API.Http.Controllers
                 provider = null;
                 return true;
             }
-            submodelId = HttpUtility.UrlDecode(submodelId);
+            submodelId = Base64UrlDecode(submodelId);
             var retrievedProvider = serviceProvider.SubmodelProviderRegistry.GetSubmodelServiceProvider(submodelId);
             if (retrievedProvider.TryGetEntity(out provider))
             {

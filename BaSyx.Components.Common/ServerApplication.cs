@@ -31,10 +31,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace BaSyx.Components.Common
 {
@@ -402,15 +400,16 @@ namespace BaSyx.Components.Common
                     RequestPath = new PathString(FILES_PATH)
                 });
             }
-            //This middleware fixes the issue with reverse proxies (e.g. IIS) decoding URLs within http paths
-            app.Use((context, next) =>
-            {
-                var url = context.GetServerVariable("UNENCODED_URL");
-                if (!string.IsNullOrEmpty(url))
-                    context.Request.Path = new PathString(url);
 
-                return next();
-            });
+            //This middleware fixes the issue with reverse proxies (e.g. IIS) decoding URLs within http paths
+            //app.Use((context, next) =>
+            //{
+            //    var url = context.GetServerVariable("UNENCODED_URL");
+            //    if (!string.IsNullOrEmpty(url))
+            //        context.Request.Path = new PathString(url);
+
+            //    return next();
+            //});
 
             foreach (var appBuilder in AppBuilderPipeline)
             {

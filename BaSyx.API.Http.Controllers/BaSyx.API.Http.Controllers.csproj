@@ -3,14 +3,14 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <Authors>Constantin Ziesche</Authors>
-    <Copyright>Copyright 2021 - Robert Bosch GmbH</Copyright>
+    <Copyright>Copyright 2022 - Bosch Rexroth AG</Copyright>
     <PackageProjectUrl>https://wiki.eclipse.org/BaSyx</PackageProjectUrl>
     <RepositoryUrl>https://github.com/eclipse-basyx/basyx-dotnet-components</RepositoryUrl>
     <PackageLicenseUrl></PackageLicenseUrl>
     <Description>The official BaSyx HTTP Controller Collection</Description>
-    <Company>Robert Bosch GmbH</Company>
+    <Company>Bosch Rexroth AG</Company>
     <PackageTags>BaSys BaSyx HTTP API Controllers</PackageTags>
-    <PackageLicenseExpression>EPL-2.0</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <PackageIcon>basyxlogo.png</PackageIcon>
     <LangVersion>8.0</LangVersion>
@@ -18,7 +18,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
     <Configurations>Debug;Release</Configurations>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

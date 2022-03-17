@@ -31,10 +31,6 @@ namespace BaSyx.Registry.Client.Http
         private static readonly ILogger logger = LoggingExtentions.CreateLogger<RegistryHttpClient>();
         public RegistryClientSettings Settings { get; }
 
-        public const string REGISTRY_BASE_PATH = "api/v1/registry";
-        public const string SUBMODEL_PATH = "submodels";
-        public const string PATH_SEPERATOR = "/";
-
         private string baseUrl = null;
         
         private CancellationTokenSource RepeatRegistrationCancellationToken = null;

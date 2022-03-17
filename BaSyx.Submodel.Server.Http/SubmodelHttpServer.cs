@@ -8,8 +8,10 @@
 *
 * SPDX-License-Identifier: MIT
 *******************************************************************************/
+using BaSyx.API.Http.Controllers;
 using BaSyx.API.ServiceProvider;
 using BaSyx.Components.Common;
+using BaSyx.Models.Connectivity;
 using BaSyx.Utils.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,13 @@ namespace BaSyx.Submodel.Server.Http
             WebHostBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton<ISubmodelServiceProvider>(submodelServiceProvider);
+                services.AddSingleton<IServiceDescriptor>(submodelServiceProvider.ServiceDescriptor);
+                services.AddMvc((options) =>
+                {
+                    options.Conventions.Add(new ControllerConvention(this)
+                        .Include(typeof(SubmodelController))
+                        .Include(typeof(DescriptorController)));
+                });
             });
         }
     }

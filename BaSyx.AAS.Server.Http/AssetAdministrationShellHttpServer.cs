@@ -8,8 +8,10 @@
 *
 * SPDX-License-Identifier: MIT
 *******************************************************************************/
+using BaSyx.API.Http.Controllers;
 using BaSyx.API.ServiceProvider;
 using BaSyx.Components.Common;
+using BaSyx.Models.Connectivity;
 using BaSyx.Utils.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,13 @@ namespace BaSyx.AAS.Server.Http
             WebHostBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton<IAssetAdministrationShellServiceProvider>(aasServiceProvider);
+                services.AddSingleton<IServiceDescriptor>(aasServiceProvider.ServiceDescriptor);
+                services.AddMvc((options) =>
+                {
+                    options.Conventions.Add(new ControllerConvention(this)
+                        .Include(typeof(AssetAdministrationShellController))
+                        .Include(typeof(DescriptorController)));
+                });
             });
         }
     }

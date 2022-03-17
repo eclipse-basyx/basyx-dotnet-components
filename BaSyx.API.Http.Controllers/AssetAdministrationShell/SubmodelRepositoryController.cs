@@ -185,12 +185,12 @@ namespace BaSyx.API.Http.Controllers
             return service.GetSubmodel(level, content, extent);
         }
 
-        /// <inheritdoc cref="SubmodelController.PutSubmodel(ISubmodel, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="SubmodelController.PutSubmodel(JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPut(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL, Name = "SubmodelRepo_PutSubmodel")]
         [Produces("application/json")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_PutSubmodel(string submodelIdentifier, [FromBody] Submodel submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult SubmodelRepo_PutSubmodel(string submodelIdentifier, [FromBody] JObject submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
@@ -213,14 +213,14 @@ namespace BaSyx.API.Http.Controllers
             return service.GetAllSubmodelElements(level, content, extent);
         }
 
-        /// <inheritdoc cref="SubmodelController.PostSubmodelElement(ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="SubmodelController.PostSubmodelElement(JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPost(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS, Name = "SubmodelRepo_PostSubmodelElement")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_PostSubmodelElement(string submodelIdentifier, [FromBody] ISubmodelElement submodelElement)
+        public IActionResult SubmodelRepo_PostSubmodelElement(string submodelIdentifier, [FromBody] JObject submodelElement)
         {
             if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
@@ -243,14 +243,14 @@ namespace BaSyx.API.Http.Controllers
             return service.GetSubmodelElementByPath(idShortPath, level, content, extent);
         }
 
-        /// <inheritdoc cref="SubmodelController.PostSubmodelElementByPath(string, ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="SubmodelController.PostSubmodelElementByPath(string, JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPost(SubmodelRepositoryRoutes.SUBMODEL_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "SubmodelRepo_PostSubmodelElementByPath")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult SubmodelRepo_PostSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromBody] ISubmodelElement submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult SubmodelRepo_PostSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromBody] JObject submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (serviceProvider.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;

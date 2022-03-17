@@ -104,12 +104,14 @@ namespace BaSyx.API.Http.Controllers
         [Produces("application/json")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult PutSubmodel([FromBody] ISubmodel submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult PutSubmodel([FromBody] JObject submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (submodel == null)
                 return ResultHandling.NullResult(nameof(submodel));
 
-            var result = serviceProvider.UpdateSubmodel(submodel);
+            var deserialized = submodel.ToObject<ISubmodel>(_serializer);
+
+            var result = serviceProvider.UpdateSubmodel(deserialized);
             return result.CreateActionResult(CrudOperation.Update);
         }
 
@@ -175,13 +177,15 @@ namespace BaSyx.API.Http.Controllers
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult PostSubmodelElement([FromBody] ISubmodelElement submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult PostSubmodelElement([FromBody] JObject submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (submodelElement == null)
                 return ResultHandling.NullResult(nameof(submodelElement));
 
-            var result = serviceProvider.CreateSubmodelElement(".", submodelElement);
-            return result.CreateActionResult(CrudOperation.Create, SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", submodelElement.IdShort));
+            var deserialized = submodelElement.ToObject<ISubmodelElement>(_serializer);
+
+            var result = serviceProvider.CreateSubmodelElement(".", deserialized);
+            return result.CreateActionResult(CrudOperation.Create, SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", deserialized.IdShort));
         }
 
         /// <summary>
@@ -237,15 +241,17 @@ namespace BaSyx.API.Http.Controllers
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult PostSubmodelElementByPath(string idShortPath, [FromBody] ISubmodelElement submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult PostSubmodelElementByPath(string idShortPath, [FromBody] JObject submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (string.IsNullOrEmpty(idShortPath))
                 return ResultHandling.NullResult(nameof(idShortPath));
             if (submodelElement == null)
                 return ResultHandling.NullResult(nameof(submodelElement));
 
-            var result = serviceProvider.CreateSubmodelElement(idShortPath, submodelElement);
-            return result.CreateActionResult(CrudOperation.Create, SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", string.Join(".", idShortPath, submodelElement.IdShort)));
+            var deserialized = submodelElement.ToObject<ISubmodelElement>(_serializer);
+
+            var result = serviceProvider.CreateSubmodelElement(idShortPath, deserialized);
+            return result.CreateActionResult(CrudOperation.Create, SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", string.Join(".", idShortPath, deserialized.IdShort)));
         }
 
         /// <summary>
@@ -374,16 +380,8 @@ namespace BaSyx.API.Http.Controllers
 
             var opRequest = operationRequest.ToObject<InvocationRequest>(_serializer);
 
-            if (async)
-            {
-                IResult<CallbackResponse> result = serviceProvider.InvokeOperationAsync(idShortPath, opRequest);
-                return result.CreateActionResult(CrudOperation.Invoke);
-            }
-            else
-            {
-                IResult<InvocationResponse> result = serviceProvider.InvokeOperation(idShortPath, opRequest);
-                return result.CreateActionResult(CrudOperation.Invoke);
-            }
+            IResult<InvocationResponse> result = serviceProvider.InvokeOperation(idShortPath, opRequest, async);
+            return result.CreateActionResult(CrudOperation.Invoke);
         }
 
         /// <summary>

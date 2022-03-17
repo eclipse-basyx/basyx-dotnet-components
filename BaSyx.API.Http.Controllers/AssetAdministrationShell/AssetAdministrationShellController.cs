@@ -16,6 +16,8 @@ using BaSyx.API.ServiceProvider;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
+using BaSyx.Utils.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BaSyx.API.Http.Controllers
 {
@@ -26,6 +28,8 @@ namespace BaSyx.API.Http.Controllers
     public class AssetAdministrationShellController : Controller
     {
         private readonly IAssetAdministrationShellServiceProvider serviceProvider;
+
+        private static JsonSerializer _serializer = JsonSerializer.Create(new DependencyInjectionJsonSerializerSettings());
 
 #if NETCOREAPP3_1
         private readonly IWebHostEnvironment hostingEnvironment;
@@ -81,12 +85,14 @@ namespace BaSyx.API.Http.Controllers
         [HttpPut(AssetAdministrationShellRoutes.AAS, Name = "PutAssetAdministrationShell")]
         [ProducesResponseType(204)]
         [Produces("application/json")]
-        public IActionResult PutAssetAdministrationShell([FromBody] IAssetAdministrationShell aas, [FromQuery] RequestContent content = default)
+        public IActionResult PutAssetAdministrationShell([FromBody] JObject aas, [FromQuery] RequestContent content = default)
         {
             if (aas == null)
                 return ResultHandling.NullResult(nameof(aas));
 
-            var result = serviceProvider.UpdateAssetAdministrationShell(aas);
+            var deserialized = aas.ToObject<AssetAdministrationShell>(_serializer);
+
+            var result = serviceProvider.UpdateAssetAdministrationShell(deserialized);
             return result.CreateActionResult(CrudOperation.Update);
         }
 
@@ -114,12 +120,14 @@ namespace BaSyx.API.Http.Controllers
         [ProducesResponseType(204)]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public IActionResult PutAssetInformation([FromBody] IAssetInformation assetInformation)
+        public IActionResult PutAssetInformation([FromBody] JObject assetInformation)
         {
             if (assetInformation == null)
                 return ResultHandling.NullResult(nameof(assetInformation));
 
-            var result = serviceProvider.UpdateAssetInformation(assetInformation);
+            var deserialized = assetInformation.ToObject<AssetInformation>(_serializer);
+
+            var result = serviceProvider.UpdateAssetInformation(deserialized);
             return result.CreateActionResult(CrudOperation.Update);
         }
 
@@ -200,12 +208,12 @@ namespace BaSyx.API.Http.Controllers
             return service.GetSubmodel(level, content, extent);
         }
 
-        /// <inheritdoc cref="SubmodelController.PutSubmodel(ISubmodel, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="SubmodelController.PutSubmodel(JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPut(AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL, Name = "Shell_PutSubmodel")]
         [Produces("application/json")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult Shell_PutSubmodel(string submodelIdentifier, [FromBody] Submodel submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult Shell_PutSubmodel(string submodelIdentifier, [FromBody] JObject submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (serviceProvider.SubmodelProviderRegistry.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
@@ -228,14 +236,14 @@ namespace BaSyx.API.Http.Controllers
             return service.GetAllSubmodelElements(level, content, extent);
         }
 
-        /// <inheritdoc cref="SubmodelController.PostSubmodelElement(ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="SubmodelController.PostSubmodelElement(JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPost(AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS, Name = "Shell_PostSubmodelElement")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult Shell_PostSubmodelElement(string submodelIdentifier, [FromBody] ISubmodelElement submodelElement)
+        public IActionResult Shell_PostSubmodelElement(string submodelIdentifier, [FromBody] JObject submodelElement)
         {
             if (serviceProvider.SubmodelProviderRegistry.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;
@@ -258,14 +266,14 @@ namespace BaSyx.API.Http.Controllers
             return service.GetSubmodelElementByPath(idShortPath, level, content, extent);
         }
 
-        /// <inheritdoc cref="SubmodelController.PostSubmodelElementByPath(string, ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="SubmodelController.PostSubmodelElementByPath(string, JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPost(AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "Shell_PostSubmodelElementByPath")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult Shell_PostSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromBody] ISubmodelElement submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult Shell_PostSubmodelElementByPath(string submodelIdentifier, string idShortPath, [FromBody] JObject submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (serviceProvider.SubmodelProviderRegistry.IsNullOrNotFound(submodelIdentifier, out IActionResult result, out ISubmodelServiceProvider provider))
                 return result;

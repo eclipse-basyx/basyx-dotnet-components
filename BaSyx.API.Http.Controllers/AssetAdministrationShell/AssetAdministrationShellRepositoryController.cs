@@ -185,11 +185,11 @@ namespace BaSyx.API.Http.Controllers
             return service.GetAssetAdministrationShell(content);
         }
 
-        /// <inheritdoc cref="AssetAdministrationShellController.PutAssetAdministrationShell(IAssetAdministrationShell, RequestContent)"/>
+        /// <inheritdoc cref="AssetAdministrationShellController.PutAssetAdministrationShell(JObject, RequestContent)"/>
         [HttpPut(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS + AssetAdministrationShellRoutes.AAS, Name = "ShellRepo_PutAssetAdministrationShell")]
         [ProducesResponseType(204)]
         [Produces("application/json")]
-        public IActionResult ShellRepo_PutAssetAdministrationShell(string aasIdentifier, [FromBody] IAssetAdministrationShell aas, [FromQuery] RequestContent content = default)
+        public IActionResult ShellRepo_PutAssetAdministrationShell(string aasIdentifier, [FromBody] JObject aas, [FromQuery] RequestContent content = default)
         {
             if (serviceProvider.IsNullOrNotFound(aasIdentifier, out IActionResult result, out IAssetAdministrationShellServiceProvider provider))
                 return result;
@@ -211,12 +211,12 @@ namespace BaSyx.API.Http.Controllers
             return service.GetAssetInformation();
         }
 
-        /// <inheritdoc cref="AssetAdministrationShellController.PutAssetInformation(IAssetInformation)"/>
+        /// <inheritdoc cref="AssetAdministrationShellController.PutAssetInformation(JObject)"/>
         [HttpPut(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS + AssetAdministrationShellRoutes.AAS_ASSET_INFORMATION, Name = "ShellRepo_PutAssetInformation")]
         [ProducesResponseType(204)]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public IActionResult ShellRepo_PutAssetInformation(string aasIdentifier, [FromBody] IAssetInformation assetInformation)
+        public IActionResult ShellRepo_PutAssetInformation(string aasIdentifier, [FromBody] JObject assetInformation)
         {
             if (serviceProvider.IsNullOrNotFound(aasIdentifier, out IActionResult result, out IAssetAdministrationShellServiceProvider provider))
                 return result;
@@ -287,12 +287,12 @@ namespace BaSyx.API.Http.Controllers
             return service.Shell_GetSubmodel(submodelIdentifier, level, content, extent);
         }
 
-        /// <inheritdoc cref="AssetAdministrationShellController.Shell_PutSubmodel(string, Submodel, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="AssetAdministrationShellController.Shell_PutSubmodel(string, JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPut(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS + AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL, Name = "ShellRepo_PutSubmodel")]
         [Produces("application/json")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult ShellRepo_PutSubmodel(string aasIdentifier, string submodelIdentifier, [FromBody] Submodel submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult ShellRepo_PutSubmodel(string aasIdentifier, string submodelIdentifier, [FromBody] JObject submodel, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (serviceProvider.IsNullOrNotFound(aasIdentifier, out IActionResult result, out IAssetAdministrationShellServiceProvider provider))
                 return result;
@@ -315,7 +315,7 @@ namespace BaSyx.API.Http.Controllers
             return service.Shell_GetAllSubmodelElements(submodelIdentifier);
         }
 
-        /// <inheritdoc cref="AssetAdministrationShellController.Shell_PostSubmodelElement(string, ISubmodelElement)"/>
+        /// <inheritdoc cref="AssetAdministrationShellController.Shell_PostSubmodelElement(string, JObject)"/>
         [HttpPost(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS + AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS, Name = "ShellRepo_PostSubmodelElement")]
         [Produces("application/json")]
         [Consumes("application/json")]
@@ -345,14 +345,14 @@ namespace BaSyx.API.Http.Controllers
             return service.Shell_GetSubmodelElementByPath(submodelIdentifier, idShortPath, level, content, extent);
         }
 
-        /// <inheritdoc cref="AssetAdministrationShellController.Shell_PostSubmodelElementByPath(string, string, ISubmodelElement, RequestLevel, RequestContent, RequestExtent)"/>
+        /// <inheritdoc cref="AssetAdministrationShellController.Shell_PostSubmodelElementByPath(string, string, JObject, RequestLevel, RequestContent, RequestExtent)"/>
         [HttpPost(AssetAdministrationShellRepositoryRoutes.SHELLS_AAS + AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH, Name = "ShellRepo_PostSubmodelElementByPath")]
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult ShellRepo_PostSubmodelElementByPath(string aasIdentifier, string submodelIdentifier, string idShortPath, [FromBody] ISubmodelElement submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
+        public IActionResult ShellRepo_PostSubmodelElementByPath(string aasIdentifier, string submodelIdentifier, string idShortPath, [FromBody] JObject submodelElement, [FromQuery] RequestLevel level = default, [FromQuery] RequestContent content = default, [FromQuery] RequestExtent extent = default)
         {
             if (serviceProvider.IsNullOrNotFound(aasIdentifier, out IActionResult result, out IAssetAdministrationShellServiceProvider provider))
                 return result;

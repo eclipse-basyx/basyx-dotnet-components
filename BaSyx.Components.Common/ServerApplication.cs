@@ -277,7 +277,6 @@ namespace BaSyx.Components.Common
             services.AddSingleton(typeof(ServerSettings), Settings);
             services.AddSingleton<IServerApplicationLifetime>(this);
 
-            
             var urls = Settings.ServerConfig.Hosting.Urls;
             var secureUrl = urls.Find(s => s.StartsWith("https"));
             if (!string.IsNullOrEmpty(secureUrl) && !context.HostingEnvironment.IsDevelopment())
@@ -299,6 +298,7 @@ namespace BaSyx.Components.Common
                 {
                     options.InputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>();
                     options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter>();
+                    options.RespectBrowserAcceptHeader = true;
                 })
                 .AddApplicationPart(ControllerAssembly)
                 .AddControllersAsServices()

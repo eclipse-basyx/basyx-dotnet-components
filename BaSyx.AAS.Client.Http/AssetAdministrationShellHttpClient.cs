@@ -223,7 +223,7 @@ namespace BaSyx.AAS.Client.Http
 
         #endregion
 
-        #region Submodel Client Interface
+        #region Asset Administration Shell Submodel Client
 
         public IResult<ISubmodel> RetrieveSubmodel(string submodelIdentifier, RequestLevel level = default, RequestContent content = default, RequestExtent extent = default)
         {

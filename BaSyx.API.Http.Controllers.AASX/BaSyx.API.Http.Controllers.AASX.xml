@@ -9,19 +9,21 @@
             The AASX Package Service
             </summary>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.#ctor(BaSyx.API.ServiceProvider.IAssetAdministrationShellServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.#ctor(BaSyx.API.ServiceProvider.IServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             Constructor for the AASX-Package Services Controller
             </summary>
-            <param name="aasServiceProvider">The Asset Administration Shell Service Provider implementation provided by the dependency injection</param>
+            <param name="serviceProvider">The Service Provider implementation provided by the dependency injection</param>
             <param name="environment">The Hosting Environment provided by the dependency injection</param>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.GetAASXPackage">
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.GenerateSerializationByIds(System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Boolean)">
             <summary>
-            Retrieves the full AASX package for a single Asset Administration Shell
+            Returns an appropriate serialization based on the specified format (see SerializationFormat)
             </summary>
-            <returns>AASX Package as download</returns>
-            <response code="200">Success</response>     
+            <param name="aasIds">The Asset Administration Shells' unique ids (BASE64-URL-encoded)</param>
+            <param name="submodelIds">The Submodels' unique ids (BASE64-URL-encoded)</param>
+            <param name="includeConceptDescriptions">Include Concept Descriptions?</param>
+            <returns></returns>
         </member>
         <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.GetThumbnail">
             <summary>

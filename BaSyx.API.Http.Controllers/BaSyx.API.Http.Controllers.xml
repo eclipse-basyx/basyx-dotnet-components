@@ -127,7 +127,7 @@
             <returns></returns>
             <response code="200">Requested Asset Administration Shells</response>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.PostAssetAdministrationShell(BaSyx.Models.AdminShell.IAssetAdministrationShell)">
+        <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.PostAssetAdministrationShell(Newtonsoft.Json.Linq.JObject)">
             <summary>
             Creates a new Asset Administration Shell
             </summary>
@@ -145,7 +145,7 @@
             <response code="200">Returns the requested Asset Administration Shell</response>
             <response code="404">No Asset Administration Shell found</response>           
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.PutAssetAdministrationShellById(System.String,BaSyx.Models.AdminShell.IAssetAdministrationShell)">
+        <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.PutAssetAdministrationShellById(System.String,Newtonsoft.Json.Linq.JObject)">
             <summary>
             Updates an existing Asset Administration Shell
             </summary>
@@ -193,7 +193,7 @@
         <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.ShellRepo_GetAllSubmodelElements(System.String,System.String,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)">
             <inheritdoc cref="M:BaSyx.API.Http.Controllers.AssetAdministrationShellController.Shell_GetAllSubmodelElements(System.String,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)"/>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.ShellRepo_PostSubmodelElement(System.String,System.String,BaSyx.Models.AdminShell.ISubmodelElement)">
+        <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.ShellRepo_PostSubmodelElement(System.String,System.String,Newtonsoft.Json.Linq.JObject)">
             <inheritdoc cref="M:BaSyx.API.Http.Controllers.AssetAdministrationShellController.Shell_PostSubmodelElement(System.String,Newtonsoft.Json.Linq.JObject)"/>
         </member>
         <member name="M:BaSyx.API.Http.Controllers.AssetAdministrationShellRepositoryController.ShellRepo_GetSubmodelElementByPath(System.String,System.String,System.String,BaSyx.Models.AdminShell.RequestLevel,BaSyx.Models.AdminShell.RequestContent,BaSyx.Models.AdminShell.RequestExtent)">

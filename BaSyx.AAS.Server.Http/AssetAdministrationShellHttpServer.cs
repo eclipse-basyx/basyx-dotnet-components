@@ -39,6 +39,7 @@ namespace BaSyx.AAS.Server.Http
             WebHostBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton<IAssetAdministrationShellServiceProvider>(aasServiceProvider);
+                services.AddSingleton<IServiceProvider>(aasServiceProvider);
                 services.AddSingleton<IServiceDescriptor>(aasServiceProvider.ServiceDescriptor);
                 services.AddMvc((options) =>
                 {

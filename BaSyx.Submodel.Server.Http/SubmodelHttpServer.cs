@@ -39,6 +39,7 @@ namespace BaSyx.Submodel.Server.Http
             WebHostBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton<ISubmodelServiceProvider>(submodelServiceProvider);
+                services.AddSingleton<IServiceProvider>(submodelServiceProvider);
                 services.AddSingleton<IServiceDescriptor>(submodelServiceProvider.ServiceDescriptor);
                 services.AddMvc((options) =>
                 {

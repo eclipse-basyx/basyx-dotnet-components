@@ -18,6 +18,8 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
+using BaSyx.Utils.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BaSyx.API.Http.Controllers
 {
@@ -28,6 +30,8 @@ namespace BaSyx.API.Http.Controllers
     public class AssetAdministrationShellRepositoryController : Controller
     {
         private readonly IAssetAdministrationShellRepositoryServiceProvider serviceProvider;
+
+        private static JsonSerializer _serializer = JsonSerializer.Create(new DependencyInjectionJsonSerializerSettings());
 
 #if NETCOREAPP3_1
         private readonly IWebHostEnvironment hostingEnvironment;
@@ -84,14 +88,15 @@ namespace BaSyx.API.Http.Controllers
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(BaSyx.Models.AdminShell.AssetAdministrationShell), 201)]
-        public IActionResult PostAssetAdministrationShell([FromBody] IAssetAdministrationShell aas)
+        public IActionResult PostAssetAdministrationShell([FromBody] JObject aas)
         {
             if (aas == null)
                 return ResultHandling.NullResult(nameof(aas));
 
-            string aasIdentifier = ResultHandling.Base64UrlEncode(aas.Identification.Id);
+            var deserialized = aas.ToObject<IAssetAdministrationShell>(_serializer);
+            string aasIdentifier = ResultHandling.Base64UrlEncode(deserialized.Identification.Id);
 
-            var result = serviceProvider.CreateAssetAdministrationShell(aas);
+            var result = serviceProvider.CreateAssetAdministrationShell(deserialized);
             return result.CreateActionResult(CrudOperation.Create, AssetAdministrationShellRepositoryRoutes.SHELLS_AAS.Replace("{aasIdentifier}", aasIdentifier));
         }
 
@@ -128,7 +133,7 @@ namespace BaSyx.API.Http.Controllers
         [Produces("application/json")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(BaSyx.Models.AdminShell.AssetAdministrationShell), 201)]
-        public IActionResult PutAssetAdministrationShellById(string aasIdentifier, [FromBody] IAssetAdministrationShell aas)
+        public IActionResult PutAssetAdministrationShellById(string aasIdentifier, [FromBody] JObject aas)
         {
             if (string.IsNullOrEmpty(aasIdentifier))
                 return ResultHandling.NullResult(nameof(aasIdentifier));
@@ -136,16 +141,17 @@ namespace BaSyx.API.Http.Controllers
                 return ResultHandling.NullResult(nameof(aas));
 
             aasIdentifier = ResultHandling.Base64UrlDecode(aasIdentifier);
+            var deserialized = aas.ToObject<IAssetAdministrationShell>(_serializer);
 
-            if (aasIdentifier != aas.Identification.Id)
+            if (aasIdentifier != deserialized.Identification.Id)
             {
                 Result badRequestResult = new Result(false,
-                    new Message(MessageType.Error, $"Passed path parameter {aasIdentifier} does not equal the Asset Administration Shells's id {aas.Identification.Id}", "400"));
+                    new Message(MessageType.Error, $"Passed path parameter {aasIdentifier} does not equal the Asset Administration Shells's id {deserialized.Identification.Id}", "400"));
 
                 return badRequestResult.CreateActionResult(CrudOperation.Create, $"shells/{aasIdentifier}");
             }
 
-            var result = serviceProvider.CreateAssetAdministrationShell(aas);
+            var result = serviceProvider.CreateAssetAdministrationShell(deserialized);
             return result.CreateActionResult(CrudOperation.Create, $"shells/{aasIdentifier}");
         }
 
@@ -322,13 +328,13 @@ namespace BaSyx.API.Http.Controllers
         [ProducesResponseType(typeof(SubmodelElement), 201)]
         [ProducesResponseType(typeof(Result), 400)]
         [ProducesResponseType(typeof(Result), 404)]
-        public IActionResult ShellRepo_PostSubmodelElement(string aasIdentifier, string submodelIdentifier, [FromBody] ISubmodelElement submodelElement)
+        public IActionResult ShellRepo_PostSubmodelElement(string aasIdentifier, string submodelIdentifier, [FromBody] JObject submodelElement)
         {
             if (serviceProvider.IsNullOrNotFound(aasIdentifier, out IActionResult result, out IAssetAdministrationShellServiceProvider provider))
                 return result;
 
             var service = new AssetAdministrationShellController(provider, hostingEnvironment);
-            return service.Shell_GetAllSubmodelElements(submodelIdentifier);
+            return service.Shell_PostSubmodelElement(submodelIdentifier, submodelElement);
         }
 
         /// <inheritdoc cref="AssetAdministrationShellController.Shell_GetSubmodelElementByPath(string, string, RequestLevel, RequestContent, RequestExtent)"/>

@@ -90,7 +90,7 @@ namespace BaSyx.API.Http.Controllers
             if (aas == null)
                 return ResultHandling.NullResult(nameof(aas));
 
-            var deserialized = aas.ToObject<AssetAdministrationShell>(_serializer);
+            var deserialized = aas.ToObject<IAssetAdministrationShell>(_serializer);
 
             var result = serviceProvider.UpdateAssetAdministrationShell(deserialized);
             return result.CreateActionResult(CrudOperation.Update);
@@ -125,7 +125,7 @@ namespace BaSyx.API.Http.Controllers
             if (assetInformation == null)
                 return ResultHandling.NullResult(nameof(assetInformation));
 
-            var deserialized = assetInformation.ToObject<AssetInformation>(_serializer);
+            var deserialized = assetInformation.ToObject<IAssetInformation>(_serializer);
 
             var result = serviceProvider.UpdateAssetInformation(deserialized);
             return result.CreateActionResult(CrudOperation.Update);

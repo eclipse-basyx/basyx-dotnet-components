@@ -8,7 +8,7 @@
 *
 * SPDX-License-Identifier: MIT
 *******************************************************************************/
-using BaSyx.AAS.Client.Http;
+using BaSyx.Clients.AdminShell.Http;
 using BaSyx.Utils.Network;
 using System;
 using System.Threading.Tasks;

@@ -8,7 +8,7 @@
 *
 * SPDX-License-Identifier: MIT
 *******************************************************************************/
-using BaSyx.AAS.Client.Http;
+using BaSyx.Clients.AdminShell.Http;
 using BaSyx.API.ServiceProvider;
 using BaSyx.Models.Connectivity;
 using BaSyx.Utils.ResultHandling;
@@ -118,37 +118,37 @@ namespace BaSyx.Discovery.mDNS
                 if (aasDescriptor == null)
                 {
                     aasDescriptor = retrieveDescriptor.Entity;
-                    aasDescriptor.SetEndpoints(new List<IEndpoint>() { new HttpEndpoint(aasEndpoint) });
+                    aasDescriptor.SetEndpoints(new List<IEndpoint>() { new Endpoint(aasEndpoint, InterfaceName.AssetAdministrationShellInterface) });
 
                     foreach (var submodelDescriptor in retrieveDescriptor.Entity.SubmodelDescriptors)
                     {
                         List<IEndpoint> submodelEndpoints = new List<IEndpoint>();
                         foreach (var submodelEndpoint in submodelDescriptor.Endpoints)
                         {
-                            if (submodelEndpoint.Address.Contains(aasEndpoint.Host))
+                            if (submodelEndpoint.ProtocolInformation.EndpointAddress.Contains(aasEndpoint.Host))
                             {
                                 submodelEndpoints.Add(submodelEndpoint);
                             }
                         }
-                        aasDescriptor.SubmodelDescriptors[submodelDescriptor.IdShort].SetEndpoints(submodelEndpoints);
+                        aasDescriptor.SubmodelDescriptors.First(s => s.IdShort == submodelDescriptor.IdShort).SetEndpoints(submodelEndpoints);
                     }
                 }
                 else
                 {
-                    aasDescriptor.AddEndpoints(new List<IEndpoint>() { new HttpEndpoint(aasEndpoint) });
+                    aasDescriptor.AddEndpoints(new List<IEndpoint>() { new Endpoint(aasEndpoint, InterfaceName.AssetAdministrationShellInterface) });
 
                     foreach (var submodelDescriptor in retrieveDescriptor.Entity.SubmodelDescriptors)
                     {
                         List<IEndpoint> submodelEndpoints = new List<IEndpoint>();
                         foreach (var submodelEndpoint in submodelDescriptor.Endpoints)
                         {
-                            if (submodelEndpoint.Address.Contains(aasEndpoint.Host))
+                            if (submodelEndpoint.ProtocolInformation.EndpointAddress.Contains(aasEndpoint.Host))
                             {
-                                if (aasDescriptor.SubmodelDescriptors[submodelDescriptor.IdShort].Endpoints.FirstOrDefault(f => f.Address == submodelEndpoint.Address) == null)
+                                if (aasDescriptor.SubmodelDescriptors.First(s => s.IdShort == submodelDescriptor.IdShort).Endpoints.FirstOrDefault(f => f.ProtocolInformation.EndpointAddress == submodelEndpoint.ProtocolInformation.EndpointAddress) == null)
                                     submodelEndpoints.Add(submodelEndpoint);
                             }
                         }
-                        aasDescriptor.SubmodelDescriptors[submodelDescriptor.IdShort].AddEndpoints(submodelEndpoints);
+                        aasDescriptor.SubmodelDescriptors.First(s => s.IdShort == submodelDescriptor.IdShort).AddEndpoints(submodelEndpoints);
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace BaSyx.Discovery.mDNS
         {
             public bool Equals(IEndpoint x, IEndpoint y)
             {
-                if (x.Address == y.Address)
+                if (x.ProtocolInformation.EndpointAddress == y.ProtocolInformation.EndpointAddress)
                     return true;
                 else
                     return false;
@@ -219,7 +219,7 @@ namespace BaSyx.Discovery.mDNS
             int port = -1;
             foreach (var endpoint in serviceProvider.ServiceDescriptor.Endpoints)
             {
-                Uri uriEndpoint = new Uri(endpoint.Address);
+                Uri uriEndpoint = new Uri(endpoint.ProtocolInformation.EndpointAddress);
                 if(port == -1)
                     port = uriEndpoint.Port;
 
@@ -242,7 +242,7 @@ namespace BaSyx.Discovery.mDNS
             for (int i = 0; i < serviceProvider.ServiceDescriptor.Endpoints.Count(); i++)
             {
                 var endpoint = serviceProvider.ServiceDescriptor.Endpoints.ElementAt(i);
-                discoveryClient.AddProperty(ASSETADMINISTRATIONSHELL_ENDPOINT + "." + endpoint.Type + "[" + i + "]", endpoint.Address);
+                discoveryClient.AddProperty(ASSETADMINISTRATIONSHELL_ENDPOINT + "." + endpoint.ProtocolInformation.EndpointProtocol + "[" + i + "]", endpoint.ProtocolInformation.EndpointAddress);
             }
    
             discoveryClient.Start();

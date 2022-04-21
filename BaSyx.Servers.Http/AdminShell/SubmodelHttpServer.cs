@@ -17,34 +17,34 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace BaSyx.AAS.Server.Http
+namespace BaSyx.Servers.AdminShell.Http
 {
-    public class AssetAdministrationShellHttpServer : ServerApplication
+    public class SubmodelHttpServer : ServerApplication
     {
-        public AssetAdministrationShellHttpServer() : this(null, null)
+        public SubmodelHttpServer() : this(null, null)
         { }
 
-        public AssetAdministrationShellHttpServer(ServerSettings serverSettings) : this(serverSettings, null)
+        public SubmodelHttpServer(ServerSettings serverSettings) : this(serverSettings, null)
         { }
 
-        public AssetAdministrationShellHttpServer(ServerSettings serverSettings, string[] webHostBuilderArgs)
-            : base(serverSettings , webHostBuilderArgs)
+        public SubmodelHttpServer(ServerSettings serverSettings, string[] webHostBuilderArgs)
+            : base(serverSettings, webHostBuilderArgs)
         {
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             WebHostBuilder.UseSetting(WebHostDefaults.ApplicationKey, entryAssembly.FullName);
         }
 
-        public void SetServiceProvider(IAssetAdministrationShellServiceProvider aasServiceProvider)
+        public void SetServiceProvider(ISubmodelServiceProvider submodelServiceProvider)
         {
             WebHostBuilder.ConfigureServices(services =>
             {
-                services.AddSingleton<IAssetAdministrationShellServiceProvider>(aasServiceProvider);
-                services.AddSingleton<IServiceProvider>(aasServiceProvider);
-                services.AddSingleton<IServiceDescriptor>(aasServiceProvider.ServiceDescriptor);
+                services.AddSingleton<ISubmodelServiceProvider>(submodelServiceProvider);
+                services.AddSingleton<IServiceProvider>(submodelServiceProvider);
+                services.AddSingleton<IServiceDescriptor>(submodelServiceProvider.ServiceDescriptor);
                 services.AddMvc((options) =>
                 {
                     options.Conventions.Add(new ControllerConvention(this)
-                        .Include(typeof(AssetAdministrationShellController))
+                        .Include(typeof(SubmodelController))
                         .Include(typeof(DescriptorController)));
                 });
             });

@@ -24,7 +24,7 @@ using BaSyx.API.Http;
 using System.Threading.Tasks;
 using BaSyx.Utils.Extensions;
 
-namespace BaSyx.AAS.Client.Http
+namespace BaSyx.Clients.AdminShell.Http
 {
     public class AssetAdministrationShellRepositoryHttpClient : SimpleHttpClient, IAssetAdministrationShellRepositoryClient
     {
@@ -32,7 +32,7 @@ namespace BaSyx.AAS.Client.Http
 
         public static bool USE_HTTPS = true;
 
-        public Uri Endpoint { get; }
+        public IEndpoint Endpoint { get; }
 
         private AssetAdministrationShellRepositoryHttpClient(HttpMessageHandler messageHandler) : base(messageHandler)
         {
@@ -43,7 +43,9 @@ namespace BaSyx.AAS.Client.Http
         { }
         public AssetAdministrationShellRepositoryHttpClient(Uri endpoint, HttpMessageHandler messageHandler) : this(messageHandler)
         {
-            Endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));   
+            endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
+            string endpointAddress = endpoint.ToString();
+            Endpoint = new Endpoint(endpointAddress.RemoveFromEnd(AssetAdministrationShellRepositoryRoutes.SHELLS), InterfaceName.AssetAdministrationShellInterface);
         }
         public AssetAdministrationShellRepositoryHttpClient(IAssetAdministrationShellRepositoryDescriptor aasRepoDescriptor) : this(aasRepoDescriptor, null)
         { }
@@ -51,22 +53,22 @@ namespace BaSyx.AAS.Client.Http
         public AssetAdministrationShellRepositoryHttpClient(IAssetAdministrationShellRepositoryDescriptor aasRepoDescriptor, HttpMessageHandler messageHandler) : this(messageHandler)
         {
             aasRepoDescriptor = aasRepoDescriptor ?? throw new ArgumentNullException(nameof(aasRepoDescriptor));
-            IEnumerable<HttpEndpoint> httpEndpoints = aasRepoDescriptor.Endpoints?.OfType<HttpEndpoint>();
-            HttpEndpoint httpEndpoint = null;
+            IEnumerable<HttpProtocol> httpEndpoints = aasRepoDescriptor.Endpoints?.OfType<HttpProtocol>();
+            HttpProtocol httpEndpoint = null;
             if (USE_HTTPS)
-                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.Type == Uri.UriSchemeHttps);
+                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.EndpointProtocol == Uri.UriSchemeHttps);
             if (httpEndpoint == null)
-                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.Type == Uri.UriSchemeHttp);
+                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.EndpointProtocol == Uri.UriSchemeHttp);
 
-            if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.Address))
+            if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.EndpointAddress))
                 throw new Exception("There is no http endpoint for instantiating a client");
             
-            Endpoint = new Uri(httpEndpoint.Address.Replace(AssetAdministrationShellRepositoryRoutes.SHELLS, string.Empty));
+            Endpoint = new Endpoint(httpEndpoint.EndpointAddress.RemoveFromEnd(AssetAdministrationShellRepositoryRoutes.SHELLS), InterfaceName.AssetAdministrationShellRepositoryInterface);
         }
 
         public Uri GetPath(string requestPath, string aasIdentifier = null, string submodelIdentifier = null, string idShortPath = null, RequestContent content = default)
         {
-            string path = Endpoint.ToString().Trim('/');
+            string path = Endpoint.ProtocolInformation.EndpointAddress.Trim('/');
 
             if (string.IsNullOrEmpty(requestPath))
                 return new Uri(path);

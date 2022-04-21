@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace BaSyx.AAS.Server.Http
+namespace BaSyx.Servers.AdminShell.Http
 {
     public class AssetAdministrationShellRepositoryHttpServer : ServerApplication
     {

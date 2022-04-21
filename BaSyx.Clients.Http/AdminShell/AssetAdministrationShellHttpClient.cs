@@ -25,8 +25,9 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using BaSyx.Utils.Extensions;
 using BaSyx.API.Http;
+using BaSyx.Clients.AdminShell.Http;
 
-namespace BaSyx.AAS.Client.Http
+namespace BaSyx.Clients.AdminShell.Http
 {
     public class AssetAdministrationShellHttpClient : SimpleHttpClient, 
         IAssetAdministrationShellClient
@@ -35,7 +36,7 @@ namespace BaSyx.AAS.Client.Http
         
         public static bool USE_HTTPS = true;
 
-        public Uri Endpoint { get; }
+        public IEndpoint Endpoint { get; }
 
         private AssetAdministrationShellHttpClient(HttpMessageHandler messageHandler) : base(messageHandler)
         {
@@ -46,7 +47,9 @@ namespace BaSyx.AAS.Client.Http
         { }
         public AssetAdministrationShellHttpClient(Uri endpoint, HttpMessageHandler messageHandler) : this(messageHandler)
         {
-            Endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
+            endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
+            string endpointAddress = endpoint.ToString();
+            Endpoint = new Endpoint(endpointAddress.RemoveFromEnd(AssetAdministrationShellRoutes.AAS), InterfaceName.AssetAdministrationShellInterface);
         }
         public AssetAdministrationShellHttpClient(IAssetAdministrationShellDescriptor aasDescriptor) : this(aasDescriptor, null)
         { }
@@ -54,22 +57,22 @@ namespace BaSyx.AAS.Client.Http
         public AssetAdministrationShellHttpClient(IAssetAdministrationShellDescriptor aasDescriptor, HttpMessageHandler messageHandler) : this(messageHandler)
         {
             aasDescriptor = aasDescriptor ?? throw new ArgumentNullException(nameof(aasDescriptor));
-            IEnumerable<HttpEndpoint> httpEndpoints = aasDescriptor.Endpoints?.OfType<HttpEndpoint>();
-            HttpEndpoint httpEndpoint = null;
+            IEnumerable<HttpProtocol> httpEndpoints = aasDescriptor.Endpoints?.OfType<HttpProtocol>();
+            HttpProtocol httpEndpoint = null;
             if (USE_HTTPS)
-                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.Type == Uri.UriSchemeHttps);
+                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.EndpointProtocol == Uri.UriSchemeHttps);
             if (httpEndpoint == null)
-                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.Type == Uri.UriSchemeHttp);
+                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.EndpointProtocol == Uri.UriSchemeHttp);
 
-            if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.Address))
+            if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.EndpointAddress))
                 throw new Exception("There is no http endpoint for instantiating a client");
 
-            Endpoint = new Uri(httpEndpoint.Address.Replace(AssetAdministrationShellRoutes.AAS, string.Empty));
+            Endpoint = new Endpoint(httpEndpoint.EndpointAddress.RemoveFromEnd(AssetAdministrationShellRoutes.AAS), InterfaceName.AssetAdministrationShellInterface);
         }
 
         public Uri GetPath(string requestPath, string submodelIdentifier = null, string idShortPath = null, RequestContent content = default)
         {
-            string path = Endpoint.ToString().Trim('/');
+            string path = Endpoint.ProtocolInformation.EndpointAddress.Trim('/');
 
             if (string.IsNullOrEmpty(requestPath))
                 return new Uri(path);
@@ -224,6 +227,13 @@ namespace BaSyx.AAS.Client.Http
         #endregion
 
         #region Asset Administration Shell Submodel Client
+
+        public ISubmodelClient CreateSubmodelClient(string submodelIdentifier)
+        {
+            Uri uri = GetPath(AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID + SubmodelRoutes.SUBMODEL, submodelIdentifier);
+            SubmodelHttpClient submodelClient = new SubmodelHttpClient(uri);
+            return submodelClient;
+        }
 
         public IResult<ISubmodel> RetrieveSubmodel(string submodelIdentifier, RequestLevel level = default, RequestContent content = default, RequestExtent extent = default)
         {

@@ -24,8 +24,9 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using BaSyx.API.Http;
 using System.Threading.Tasks;
+using BaSyx.Utils.Extensions;
 
-namespace BaSyx.Submodel.Client.Http
+namespace BaSyx.Clients.AdminShell.Http
 {
     public class SubmodelHttpClient : SimpleHttpClient, ISubmodelClient
     {
@@ -33,7 +34,7 @@ namespace BaSyx.Submodel.Client.Http
 
         public static bool USE_HTTPS = true;
 
-        public Uri Endpoint { get; }
+        public IEndpoint Endpoint { get; }
 
         private SubmodelHttpClient(HttpMessageHandler messageHandler) : base(messageHandler)
         {
@@ -44,7 +45,9 @@ namespace BaSyx.Submodel.Client.Http
         { }
         public SubmodelHttpClient(Uri endpoint, HttpMessageHandler messageHandler) : this(messageHandler)
         {
-            Endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));   
+            endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
+            string endpointAddress = endpoint.ToString();
+            Endpoint = new Endpoint(endpointAddress.RemoveFromEnd(SubmodelRoutes.SUBMODEL), InterfaceName.SubmodelInterface);
         }
         public SubmodelHttpClient(ISubmodelDescriptor submodelDescriptor) : this(submodelDescriptor, null)
         { }
@@ -52,22 +55,22 @@ namespace BaSyx.Submodel.Client.Http
         public SubmodelHttpClient(ISubmodelDescriptor submodelDescriptor, HttpMessageHandler messageHandler) : this(messageHandler)
         {
             submodelDescriptor = submodelDescriptor ?? throw new ArgumentNullException(nameof(submodelDescriptor));
-            IEnumerable<HttpEndpoint> httpEndpoints = submodelDescriptor.Endpoints?.OfType<HttpEndpoint>();
-            HttpEndpoint httpEndpoint = null;
+            IEnumerable<HttpProtocol> httpEndpoints = submodelDescriptor.Endpoints?.OfType<HttpProtocol>();
+            HttpProtocol httpEndpoint = null;
             if (USE_HTTPS)
-                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.Type == Uri.UriSchemeHttps);
+                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.EndpointProtocol == Uri.UriSchemeHttps);
             if (httpEndpoint == null)
-                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.Type == Uri.UriSchemeHttp);
+                httpEndpoint = httpEndpoints?.FirstOrDefault(p => p.EndpointProtocol == Uri.UriSchemeHttp);
 
-            if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.Address))
+            if (httpEndpoint == null || string.IsNullOrEmpty(httpEndpoint.EndpointAddress))
                 throw new Exception("There is no http endpoint for instantiating a client");
             
-            Endpoint = new Uri(httpEndpoint.Address.Replace(SubmodelRoutes.SUBMODEL, string.Empty));
+            Endpoint = new Endpoint(httpEndpoint.EndpointAddress.RemoveFromEnd(SubmodelRoutes.SUBMODEL), InterfaceName.SubmodelInterface);
         }
 
         public Uri GetPath(string requestPath, string idShortPath = null, RequestContent content = default)
         {
-            string path = Endpoint.ToString().Trim('/');
+            string path = Endpoint.ProtocolInformation.EndpointAddress.Trim('/');
 
             if (string.IsNullOrEmpty(requestPath))
                 return new Uri(path);

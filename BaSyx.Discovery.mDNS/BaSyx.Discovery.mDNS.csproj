@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BaSyx.AAS.Client.Http\BaSyx.AAS.Client.Http.csproj" />
+    <ProjectReference Include="..\BaSyx.Clients.Http\BaSyx.Clients.Http.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('..\..\basyx-dotnet-sdk\')">

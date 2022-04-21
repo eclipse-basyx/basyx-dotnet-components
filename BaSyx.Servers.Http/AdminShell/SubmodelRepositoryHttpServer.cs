@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace BaSyx.Submodel.Server.Http
+namespace BaSyx.Servers.AdminShell.Http
 {
     public class SubmodelRepositoryHttpServer : ServerApplication
     {

@@ -74,13 +74,13 @@ namespace BaSyx.Components.Common
         { }
         protected ServerApplication(ServerSettings settings, string[] webHostBuilderArgs)
         {
-            ExecutionPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            ExecutionPath = settings?.ExecutionPath ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            
+            if (settings == null && !EmbeddedResource.CheckOrWriteRessourceToFile(typeof(ServerApplication).Assembly, Path.Combine(ExecutionPath, ServerSettings.FileName)))
+                logger.LogError($"{ServerSettings.FileName} cannot be loaded or written to filesystem");
+
+            Settings = settings ?? ServerSettings.LoadSettingsFromFile(ServerSettings.FileName) ?? throw new ArgumentNullException(nameof(settings));
             ControllerAssembly = Assembly.Load(CONTROLLER_ASSEMBLY_NAME);
-
-            if (settings == null && !EmbeddedResource.CheckOrWriteRessourceToFile(typeof(ServerApplication).Assembly, Path.Combine(ExecutionPath, "ServerSettings.xml")))
-                logger.LogError("ServerSettings.xml cannot be loaded or written");
-
-            Settings = settings ?? ServerSettings.LoadSettingsFromFile("ServerSettings.xml") ?? throw new ArgumentNullException(nameof(settings));
 
             webHostBuilderArgs ??= Environment.GetCommandLineArgs();
             WebHostBuilder = DefaultWebHostBuilder.CreateWebHostBuilder(webHostBuilderArgs, Settings);

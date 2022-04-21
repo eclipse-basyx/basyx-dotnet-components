@@ -4,19 +4,57 @@
         <name>BaSyx.API.Http.Controllers.AASX</name>
     </assembly>
     <members>
-        <member name="T:BaSyx.API.Http.Controllers.PackageService.PackageService">
+        <member name="T:BaSyx.API.Http.Controllers.PackageService.FileServerController">
             <summary>
-            The AASX Package Service
+            The File Server Controller Controller
             </summary>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.#ctor(BaSyx.API.ServiceProvider.IServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.FileServerController.#ctor(BaSyx.API.ServiceProvider.IServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
-            Constructor for the AASX-Package Services Controller
+            Constructor for the File Server Controller
             </summary>
             <param name="serviceProvider">The Service Provider implementation provided by the dependency injection</param>
             <param name="environment">The Hosting Environment provided by the dependency injection</param>
         </member>
-        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.GenerateSerializationByIds(System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Boolean)">
+        <member name="T:BaSyx.API.Http.Controllers.PackageService.PackageController">
+            <summary>
+            The AASX Package Controller
+            </summary>
+        </member>
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageController.#ctor(BaSyx.API.ServiceProvider.IServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            Constructor for the AASX Package Controller
+            </summary>
+            <param name="serviceProvider">The Service Provider implementation provided by the dependency injection</param>
+            <param name="environment">The Hosting Environment provided by the dependency injection</param>
+        </member>
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageController.GetAASXPackage">
+            <summary>
+            Retrieves the full AASX package for a single Asset Administration Shell
+            </summary>
+            <returns>AASX Package as download</returns>
+            <response code="200">Success</response>     
+        </member>
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageController.GetThumbnail">
+            <summary>
+            Returns the thumbnail of the AASX package
+            </summary>
+            <returns>AASX Package as download</returns>
+            <response code="200">Success</response>     
+        </member>
+        <member name="T:BaSyx.API.Http.Controllers.PackageService.SerializationController">
+            <summary>
+            The Serialization Controller
+            </summary>
+        </member>
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.SerializationController.#ctor(BaSyx.API.ServiceProvider.IServiceProvider,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            Constructor for the Serialization Controller
+            </summary>
+            <param name="serviceProvider">The Service Provider implementation provided by the dependency injection</param>
+            <param name="environment">The Hosting Environment provided by the dependency injection</param>
+        </member>
+        <member name="M:BaSyx.API.Http.Controllers.PackageService.SerializationController.GenerateSerializationByIds(System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Boolean)">
             <summary>
             Returns an appropriate serialization based on the specified format (see SerializationFormat)
             </summary>
@@ -24,13 +62,6 @@
             <param name="submodelIds">The Submodels' unique ids (BASE64-URL-encoded)</param>
             <param name="includeConceptDescriptions">Include Concept Descriptions?</param>
             <returns></returns>
-        </member>
-        <member name="M:BaSyx.API.Http.Controllers.PackageService.PackageService.GetThumbnail">
-            <summary>
-            Returns the thumbnail of the AASX package
-            </summary>
-            <returns>AASX Package as download</returns>
-            <response code="200">Success</response>     
         </member>
     </members>
 </doc>

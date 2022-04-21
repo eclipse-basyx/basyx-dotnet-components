@@ -32,6 +32,8 @@ namespace BaSyx.Registry.Client.Http
         public RegistryClientSettings Settings { get; }
 
         private string baseUrl = null;
+
+        public IEndpoint Endpoint { get; private set; }
         
         private CancellationTokenSource RepeatRegistrationCancellationToken = null;
 
@@ -43,6 +45,7 @@ namespace BaSyx.Registry.Client.Http
                 SetDefaultTimeout(TimeSpan.FromMilliseconds(settings.ClientConfig.RequestConfig.RequestTimeout.Value));
 
             baseUrl = settings.RegistryConfig.RegistryUrl.TrimEnd('/');
+            Endpoint = new Endpoint(baseUrl, InterfaceName.AssetAdministrationRegistryInterface);
         }
 
         public RegistryHttpClient() : this(null, null)
@@ -110,12 +113,12 @@ namespace BaSyx.Registry.Client.Http
             return RetrieveAssetAdministrationShellRegistrationAsync(aasIdentifier).GetAwaiter().GetResult();
         }
 
-        public IResult<IQueryableElementContainer<IAssetAdministrationShellDescriptor>> RetrieveAllAssetAdministrationShellRegistrations(Predicate<IAssetAdministrationShellDescriptor> predicate)
+        public IResult<IEnumerable<IAssetAdministrationShellDescriptor>> RetrieveAllAssetAdministrationShellRegistrations(Predicate<IAssetAdministrationShellDescriptor> predicate)
         {
             return RetrieveAllAssetAdministrationShellRegistrationsAsync(predicate).GetAwaiter().GetResult();
         }
 
-        public IResult<IQueryableElementContainer<IAssetAdministrationShellDescriptor>> RetrieveAllAssetAdministrationShellRegistrations()
+        public IResult<IEnumerable<IAssetAdministrationShellDescriptor>> RetrieveAllAssetAdministrationShellRegistrations()
         {
             return RetrieveAllAssetAdministrationShellRegistrationsAsync().GetAwaiter().GetResult();
         }
@@ -135,12 +138,12 @@ namespace BaSyx.Registry.Client.Http
             return UpdateSubmodelRegistrationAsync(aasIdentifier, submodelIdentifier, submodelDescriptor).GetAwaiter().GetResult();
         }
 
-        public IResult<IQueryableElementContainer<ISubmodelDescriptor>> RetrieveAllSubmodelRegistrations(string aasIdentifier, Predicate<ISubmodelDescriptor> predicate)
+        public IResult<IEnumerable<ISubmodelDescriptor>> RetrieveAllSubmodelRegistrations(string aasIdentifier, Predicate<ISubmodelDescriptor> predicate)
         {
             return RetrieveAllSubmodelRegistrationsAsync(aasIdentifier, predicate).GetAwaiter().GetResult();
         }
 
-        public IResult<IQueryableElementContainer<ISubmodelDescriptor>> RetrieveAllSubmodelRegistrations(string aasIdentifier)
+        public IResult<IEnumerable<ISubmodelDescriptor>> RetrieveAllSubmodelRegistrations(string aasIdentifier)
         {
             return RetrieveAllSubmodelRegistrationsAsync(aasIdentifier).GetAwaiter().GetResult();
         }
@@ -197,20 +200,20 @@ namespace BaSyx.Registry.Client.Http
             return result;
         }
 
-        public async Task<IResult<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>> RetrieveAllAssetAdministrationShellRegistrationsAsync()
+        public async Task<IResult<IEnumerable<IAssetAdministrationShellDescriptor>>> RetrieveAllAssetAdministrationShellRegistrationsAsync()
         {
             Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTORS);
             var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = await base.SendRequestAsync(request, CancellationToken.None);
             var result = await base.EvaluateResponseAsync<IEnumerable<IAssetAdministrationShellDescriptor>>(response, response.Entity);
             response?.Entity?.Dispose();
-            return new Result<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>(result.Success, result.Entity?.AsQueryableElementContainer(), result.Messages);
+            return new Result<IEnumerable<IAssetAdministrationShellDescriptor>>(result.Success, result.Entity, result.Messages);
         }
 
-        public async Task<IResult<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>> RetrieveAllAssetAdministrationShellRegistrationsAsync(Predicate<IAssetAdministrationShellDescriptor> predicate)
+        public async Task<IResult<IEnumerable<IAssetAdministrationShellDescriptor>>> RetrieveAllAssetAdministrationShellRegistrationsAsync(Predicate<IAssetAdministrationShellDescriptor> predicate)
         {
             if (predicate == null)
-                return new Result<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>(new ArgumentNullException(nameof(predicate)));
+                return new Result<IEnumerable<IAssetAdministrationShellDescriptor>>(new ArgumentNullException(nameof(predicate)));
 
             Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTORS);
             var request = base.CreateRequest(uri, HttpMethod.Get);
@@ -220,13 +223,13 @@ namespace BaSyx.Registry.Client.Http
             if (!result.Success || result.Entity == null)
             {
                 response?.Entity?.Dispose();
-                return new Result<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>(result);
+                return new Result<IEnumerable<IAssetAdministrationShellDescriptor>>(result);
             }
             else
             {
                 response?.Entity?.Dispose();
                 var foundItems = result.Entity.Where(w => predicate.Invoke(w));
-                return new Result<IQueryableElementContainer<IAssetAdministrationShellDescriptor>>(result.Success, foundItems?.AsQueryableElementContainer(), result.Messages);
+                return new Result<IEnumerable<IAssetAdministrationShellDescriptor>>(result.Success, foundItems, result.Messages);
             }
         }
 
@@ -275,25 +278,25 @@ namespace BaSyx.Registry.Client.Http
             return result;
         }
 
-        public async Task<IResult<IQueryableElementContainer<ISubmodelDescriptor>>> RetrieveAllSubmodelRegistrationsAsync(string aasIdentifier)
+        public async Task<IResult<IEnumerable<ISubmodelDescriptor>>> RetrieveAllSubmodelRegistrationsAsync(string aasIdentifier)
         {
             if (string.IsNullOrEmpty(aasIdentifier))
-                return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(new ArgumentNullException(nameof(aasIdentifier)));
+                return new Result<IEnumerable<ISubmodelDescriptor>>(new ArgumentNullException(nameof(aasIdentifier)));
 
             Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTORS, aasIdentifier);
             var request = base.CreateRequest(uri, HttpMethod.Get);
             var response = await base.SendRequestAsync(request, CancellationToken.None);
             var result = await base.EvaluateResponseAsync<IEnumerable<ISubmodelDescriptor>>(response, response.Entity);
             response?.Entity?.Dispose();
-            return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(result.Success, result.Entity?.AsQueryableElementContainer(), result.Messages);
+            return new Result<IEnumerable<ISubmodelDescriptor>>(result.Success, result.Entity, result.Messages);
         }
 
-        public async Task<IResult<IQueryableElementContainer<ISubmodelDescriptor>>> RetrieveAllSubmodelRegistrationsAsync(string aasIdentifier, Predicate<ISubmodelDescriptor> predicate)
+        public async Task<IResult<IEnumerable<ISubmodelDescriptor>>> RetrieveAllSubmodelRegistrationsAsync(string aasIdentifier, Predicate<ISubmodelDescriptor> predicate)
         {
             if (string.IsNullOrEmpty(aasIdentifier))
-                return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(new ArgumentNullException(nameof(aasIdentifier)));
+                return new Result<IEnumerable<ISubmodelDescriptor>>(new ArgumentNullException(nameof(aasIdentifier)));
             if (predicate == null)
-                return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(new ArgumentNullException(nameof(predicate)));
+                return new Result<IEnumerable<ISubmodelDescriptor>>(new ArgumentNullException(nameof(predicate)));
 
             Uri uri = GetPath(AssetAdministrationShellRegistryRoutes.SHELL_DESCRIPTOR_ID_SUBMODEL_DESCRIPTORS, aasIdentifier);
             var request = base.CreateRequest(uri, HttpMethod.Get);
@@ -303,13 +306,13 @@ namespace BaSyx.Registry.Client.Http
             if (!result.Success || result.Entity == null)
             {
                 response?.Entity?.Dispose();
-                return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(result);
+                return new Result<IEnumerable<ISubmodelDescriptor>>(result);
             }
             else
             {
                 response?.Entity?.Dispose();
                 var foundItems = result.Entity.Where(w => predicate.Invoke(w));
-                return new Result<IQueryableElementContainer<ISubmodelDescriptor>>(result.Success, foundItems?.AsQueryableElementContainer(), result.Messages);
+                return new Result<IEnumerable<ISubmodelDescriptor>>(result.Success, foundItems, result.Messages);
             }          
         }
 

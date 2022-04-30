@@ -8,6 +8,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *******************************************************************************/
+using BaSyx.Utils.Settings.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,7 @@ namespace BaSyx.Components.Common.Abstractions
     public interface IServerApplication : IServerApplicationLifetime
     {
         Assembly ControllerAssembly { get; }
+        ServerSettings Settings { get; }
 
         void Configure(Action<IApplicationBuilder> app);
         void ConfigureServices(Action<IServiceCollection> services);

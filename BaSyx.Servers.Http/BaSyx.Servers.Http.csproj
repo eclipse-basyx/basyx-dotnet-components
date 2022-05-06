@@ -9,14 +9,14 @@
     <PackageProjectUrl>https://wiki.eclipse.org/BaSyx</PackageProjectUrl>
     <RepositoryUrl>https://github.com/eclipse-basyx/basyx-dotnet-components</RepositoryUrl>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <Description>The official BaSyx HTTP REST-API for Asset Administration Shells</Description>
+    <Description>The official BaSyx Server Library for Asset Administration Shells</Description>
     <Company>Bosch Rexroth AG</Company>
     <PackageTags>BaSys BaSyx Component HTTP REST-API AssetAdministrationShell</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>basyxlogo.png</PackageIcon>
     <IsPackable>true</IsPackable>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Version>2.0.0</Version>
+    <Version>2.0.0-alpha.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

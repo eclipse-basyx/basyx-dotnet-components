@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -59,7 +60,8 @@ namespace BaSyx.Components.Common
         public Assembly ControllerAssembly { get; private set; }
         public ServerSettings Settings { get; protected set; }
         public IWebHostBuilder WebHostBuilder { get; protected set; }
-               
+        public IConfiguration Configuration { get; protected set; }
+
         public string ExecutionPath { get; }
 
         public Action ApplicationStarted { get; set; }
@@ -83,7 +85,12 @@ namespace BaSyx.Components.Common
             ControllerAssembly = Assembly.Load(CONTROLLER_ASSEMBLY_NAME);
 
             webHostBuilderArgs ??= Environment.GetCommandLineArgs();
-            WebHostBuilder = DefaultWebHostBuilder.CreateWebHostBuilder(webHostBuilderArgs, Settings);
+            WebHostBuilder = DefaultWebHostBuilder
+                .CreateWebHostBuilder(webHostBuilderArgs, Settings)
+                .ConfigureAppConfiguration((context, builder) =>
+                {
+                    Configuration = builder.Build();
+                });
             AppBuilderPipeline = new List<Action<IApplicationBuilder>>();
             ServiceBuilderPipeline = new List<Action<IServiceCollection>>();
             EndpointBuilderPipeline = new List<Action<IEndpointRouteBuilder>>();
@@ -119,7 +126,7 @@ namespace BaSyx.Components.Common
             }
 
             _webRoot = Path.Join(ExecutionPath, DEFAULT_WEB_ROOT);
-            _defaultRoute = string.IsNullOrEmpty(Settings.ServerConfig.DefaultRoute) ? UI_RELATIVE_PATH : Settings.ServerConfig.DefaultRoute;
+            _defaultRoute = Settings.ServerConfig.DefaultRoute;
 
             try
             {
@@ -145,6 +152,14 @@ namespace BaSyx.Components.Common
             logger.LogInformation("Starting Server asynchronously...");
 
             await WebHostBuilder.Build().RunAsync(cancellationToken);
+        }
+
+        public virtual void ConfigureLogging(Action<ILoggingBuilder> logging)
+        {
+            WebHostBuilder.ConfigureLogging(configureLogging =>
+            {
+                logging.Invoke(configureLogging);
+            });
         }
         public virtual void ConfigureLogging(LogLevel minimumLogLevel)
         {
@@ -424,8 +439,10 @@ namespace BaSyx.Components.Common
                             .AllowAnyMethod()
                             .AllowAnyOrigin()
             );
-            app.UseAuthorization();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
@@ -437,8 +454,11 @@ namespace BaSyx.Components.Common
                 }
             });
 
-            var options = new RewriteOptions().AddRedirect("^$", _defaultRoute);
-            app.UseRewriter(options);
+            if (!string.IsNullOrEmpty(_defaultRoute))
+            {
+                var options = new RewriteOptions().AddRedirect("^$", _defaultRoute);
+                app.UseRewriter(options);
+            }
 
             if (ApplicationStarted != null)
                 applicationLifetime.ApplicationStarted.Register(ApplicationStarted);

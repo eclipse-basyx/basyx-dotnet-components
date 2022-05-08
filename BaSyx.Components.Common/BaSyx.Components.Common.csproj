@@ -14,7 +14,7 @@
     <PackageIcon>basyxlogo.png</PackageIcon>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-    <Version>2.0.0-alpha.1</Version>
+    <Version>2.0.0-alpha.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,9 +35,9 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
-    <PackageReference Include="BaSyx.API" Version="2.0.0-alpha.1" />
-    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="2.0.0-alpha.1" />
-    <PackageReference Include="BaSyx.Utils" Version="2.0.0-alpha.1" />
+    <PackageReference Include="BaSyx.API" Version="2.0.0-alpha.2" />
+    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="2.0.0-alpha.2" />
+    <PackageReference Include="BaSyx.Utils" Version="2.0.0-alpha.2" />
   </ItemGroup>
 
 

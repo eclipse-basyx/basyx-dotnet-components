@@ -20,7 +20,7 @@
       <!-- Password for the certificate -->
       <ServerCertificatePassword/>
     </Security>
-    <!-- Default route of the server. Navigates automatically to /ui if left empty -->
+    <!-- Default route of the server, e.g. /ui if BaSys Common UI is used -->
     <DefaultRoute/>
   </ServerConfig>
   <!-- Optional Web-UI configuration -->

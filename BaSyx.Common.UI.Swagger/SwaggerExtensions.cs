@@ -115,7 +115,8 @@ namespace BaSyx.Common.UI.Swagger
 
                     // Set the comments path for the Swagger JSON and UI.
                     string xmlFile = $"{serverApp.ControllerAssembly.GetName().Name}.xml";
-                    string xmlPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), xmlFile);
+                    string executionPath = serverApp.Settings?.ExecutionPath ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string xmlPath = Path.Combine(executionPath, xmlFile);
                     if (EmbeddedResource.CheckOrWriteRessourceToFile(serverApp.ControllerAssembly, xmlPath))
                         c.IncludeXmlComments(xmlPath, true);
 

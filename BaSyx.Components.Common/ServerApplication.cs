@@ -301,6 +301,7 @@ namespace BaSyx.Components.Common
                 {
                     options.InputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>();
                     options.OutputFormatters.RemoveType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter>();
+                    options.RespectBrowserAcceptHeader = true;
                 })
                 .AddApplicationPart(ControllerAssembly)
                 .AddControllersAsServices()
@@ -402,15 +403,6 @@ namespace BaSyx.Components.Common
                     RequestPath = new PathString(FILES_PATH)
                 });
             }
-            //This middleware fixes the issue with reverse proxies (e.g. IIS) decoding URLs within http paths
-            app.Use((context, next) =>
-            {
-                var url = context.GetServerVariable("UNENCODED_URL");
-                if (!string.IsNullOrEmpty(url))
-                    context.Request.Path = new PathString(url);
-
-                return next();
-            });
 
             app.Use((context, next) =>
             {

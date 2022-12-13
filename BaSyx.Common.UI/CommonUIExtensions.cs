@@ -23,23 +23,35 @@ namespace BaSyx.Common.UI
         public const string SubmodelServer = "Submodel";
         public const string SubmodelRepositoryServer = "SubmodelRepository";        
     }
+
     public static class CommonUIExtensions
     {
+        private const string DEFAULT_UI_URL = "ui";
+
         public static void AddBaSyxUI(this IServerApplication serverApp, string pageName)
         {
+            string uiUrl = serverApp.Settings?.UIConfig?.Url ?? DEFAULT_UI_URL;
             serverApp.ConfigureServices(services =>
-            {
-                services.AddBaSyxUI(pageName);
+            {                
+                services.AddBaSyxUI(pageName, uiUrl);
             });            
         }
 
-        public static void AddBaSyxUI(this IServiceCollection services, string pageName)
+        public static void AddBaSyxUI(this IServerApplication serverApp, string pageName, string uiUrl)
         {
-            services.AddMvc()
-                .AddRazorPagesOptions(options => options.Conventions.AddPageRoute("/" + pageName, "ui"));                
+            serverApp.ConfigureServices(services =>
+            {
+                services.AddBaSyxUI(pageName, uiUrl);
+            });
+        }
+
+        public static void AddBaSyxUI(this IServiceCollection services, string pageName, string uiUrl = DEFAULT_UI_URL)
+        {            
+            services.AddMvc().AddRazorPagesOptions(options => options.Conventions.AddPageRoute("/" + pageName, uiUrl));                
 
             services.ConfigureOptions(typeof(CommonUIConfigureOptions));
         }
+        
 
         public static bool TryGetValue<T>(this ViewDataDictionary<dynamic> viewDataDictionary, string key, out T value)
         {

@@ -22,7 +22,11 @@
         if (!string.IsNullOrEmpty(settings.UIConfig.Title))
         {
             ViewData.Add("Title", settings.UIConfig.Title);
-        }
+        }        
+    }
+    if (!string.IsNullOrEmpty(settings.ServerConfig.PathBase))
+    {
+        ViewData.Add("PathBase", settings.ServerConfig.PathBase);
     }
 
     Layout = "_Layout";

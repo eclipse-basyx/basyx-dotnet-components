@@ -1,21 +1,27 @@
 ﻿@using BaSyx.Utils.Settings.Types;
+@{
+    string pathBase = string.Empty;
+    if (ViewData.ContainsKey("PathBase"))
+    {
+        pathBase = (string)ViewData["PathBase"];
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-
-    <link rel="icon" type="image/png" href="~/favicon.png" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap4-toggle.min.css" />
-    <link rel="stylesheet" href="~/lib/fontawesome/css/all.css" />
-    <link rel="stylesheet" href="~/css/site.css" />       
+    <link rel="icon" type="image/png" href="@pathBase/favicon.png" />
+    <link rel="stylesheet" href="@pathBase/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="@pathBase/lib/bootstrap/dist/css/bootstrap4-toggle.min.css" />
+    <link rel="stylesheet" href="@pathBase/lib/fontawesome/css/all.css" />
+    <link rel="stylesheet" href="@pathBase/css/site.css" />
 </head>
 <body>
     <header id="basyx_ui_header">
         <nav id="basyx_ui_navbar" class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#"><img src="~/images/basyxlogo.png" width="200" /></a>
+            <a class="navbar-brand" href="#"><img src="@pathBase/images/basyxlogo.png" width="200" /></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -68,14 +74,14 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap4-toggle.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/basyx.js"></script>
+    <script src="@pathBase/lib/jquery/dist/jquery.min.js"></script>
+    <script src="@pathBase/lib/bootstrap/dist/js/bootstrap4-toggle.min.js"></script>
+    <script src="@pathBase/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="@pathBase/js/basyx.js"></script>
 
     @if (ViewData.TryGetValue<bool>("BlazorSupportEnabled", out bool bsa) && bsa)
     {
-        <script src="_framework/blazor.server.js"></script>
+        <script src="@pathBase/_framework/blazor.server.js"></script>
     }
 
     @RenderSection("Scripts", required: false)

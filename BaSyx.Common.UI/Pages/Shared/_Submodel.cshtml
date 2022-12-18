@@ -181,7 +181,7 @@
 }
 
 @functions
-    {
+{
 
     public string GetRequestPath(string submodelId, string pathId)
     {
@@ -198,22 +198,23 @@
         }
 
         string apiType = (string)ViewData["ApiType"];
-        string requestPath = string.Empty;
+        string pathBase = (string)ViewData["PathBase"];
+        string requestPath = pathBase;
         if(apiType == "AssetAdministrationShell")
         {
-            requestPath = "/aas/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
+            requestPath += "/aas/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
         }
         else if(apiType == "Submodel")
         {
-            requestPath = "/submodel/submodelElements/" + pathId;
+            requestPath += "/submodel/submodelElements/" + pathId;
         }
         else if(apiType == "AssetAdministrationShellRepository")
         {
-            requestPath = "/shells/" + aasId + "/aas/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
+            requestPath += "/shells/" + aasId + "/aas/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
         }
         else if(apiType == "SubmodelRepository")
         {
-            requestPath = "/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
+            requestPath += "/submodels/" + submodelId + "/submodel/submodelElements/" + pathId;
         }
         return requestPath;
     }

@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,7 @@ namespace BaSyx.Components.Common
         private string _webRoot;
         private bool _secure = false;
         private string _defaultRoute = null;
+        private string _pathBase = null;
 
         private readonly List<Action<IApplicationBuilder>> AppBuilderPipeline;
         private readonly List<Action<IServiceCollection>> ServiceBuilderPipeline;
@@ -175,6 +177,12 @@ namespace BaSyx.Components.Common
             if (Settings?.ServerConfig?.Hosting != null)
                 Settings.ServerConfig.Hosting.Urls = urls?.ToList();
         }
+
+        public virtual void UsePathBase(string pathBase)
+        {
+            _pathBase= pathBase;
+        }
+
         public virtual void ProvideContent(Uri relativeUri, Stream content)
         {
             try
@@ -359,6 +367,20 @@ namespace BaSyx.Components.Common
 
             if (env.IsProduction())
                 app.UseHsts();
+
+            if (!string.IsNullOrEmpty(_pathBase))
+            {
+                app.UsePathBase(_pathBase);
+                app.Use(async (context, next) =>
+                {
+                    if (!context.Request.PathBase.HasValue)
+                    {
+                        context.Response.Redirect(_pathBase + context.Request.Path);
+                        return;
+                    }
+                    await next();
+                });
+            }
 
             app.UseExceptionHandler(ERROR_PATH);
 

@@ -36,7 +36,7 @@
                     @if (ViewData.TryGetValue<string>("ApiRoot", out string apiRoot))
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="@apiRoot">REST-API</a>
+                            <a class="nav-link" href="@pathBase@apiRoot">REST-API</a>
                         </li>
                     }
                     @if (ViewData.TryGetValue<List<Link>>("Links", out List<Link> links) && links?.Count > 0)

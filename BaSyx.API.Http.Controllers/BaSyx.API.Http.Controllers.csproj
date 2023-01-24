@@ -18,7 +18,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
     <Configurations>Debug;Release</Configurations>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,8 +57,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
-    <PackageReference Include="BaSyx.API" Version="1.0.0" />
-    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.0" />
+    <PackageReference Include="BaSyx.API" Version="1.0.1" />
+    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.1" />
   </ItemGroup>
 
 

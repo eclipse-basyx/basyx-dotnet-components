@@ -40,9 +40,7 @@ namespace BaSyx.Components.Common
     public abstract class ServerApplication : IServerApplication
     {
         private static readonly ILogger logger = LoggingExtentions.CreateLogger<ServerApplication>();
-
-        private string _contentRoot;
-        private string _webRoot;
+        
         private bool _secure = false;
         private string _defaultRoute = null;
 
@@ -69,6 +67,10 @@ namespace BaSyx.Components.Common
         public Action ApplicationStopping { get; set; }
 
         public Action ApplicationStopped { get; set; }
+
+        public string ContentRoot { get; private set; }
+
+        public string WebRoot { get; private set; }
 
         protected ServerApplication() : this(null, null)
         { }
@@ -108,36 +110,36 @@ namespace BaSyx.Components.Common
             ConfigureLogging(LogLevel.Trace);
 
             if (string.IsNullOrEmpty(Settings.ServerConfig.Hosting.ContentPath))
-                _contentRoot = Path.Join(ExecutionPath, DEFAULT_CONTENT_ROOT);
+                ContentRoot = Path.Join(ExecutionPath, DEFAULT_CONTENT_ROOT);
             else if (Path.IsPathRooted(Settings.ServerConfig.Hosting.ContentPath))
-                _contentRoot = Settings.ServerConfig.Hosting.ContentPath;
+                ContentRoot = Settings.ServerConfig.Hosting.ContentPath;
             else
-                _contentRoot = Path.Join(ExecutionPath, Settings.ServerConfig.Hosting.ContentPath);
+                ContentRoot = Path.Join(ExecutionPath, Settings.ServerConfig.Hosting.ContentPath);
 
             try
             {
-                if (!Directory.Exists(_contentRoot))
-                    Directory.CreateDirectory(_contentRoot);
-                WebHostBuilder.UseContentRoot(_contentRoot);
+                if (!Directory.Exists(ContentRoot))
+                    Directory.CreateDirectory(ContentRoot);
+                WebHostBuilder.UseContentRoot(ContentRoot);
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"ContentRoot path {_contentRoot} cannot be created ");
+                logger.LogError(e, $"ContentRoot path {ContentRoot} cannot be created ");
             }
 
-            _webRoot = Path.Join(ExecutionPath, DEFAULT_WEB_ROOT);
+            WebRoot = Path.Join(ExecutionPath, DEFAULT_WEB_ROOT);
             _defaultRoute = Settings.ServerConfig.DefaultRoute;
 
             try
             {
-                if (!Directory.Exists(_webRoot))
-                    Directory.CreateDirectory(_webRoot);
-                WebHostBuilder.UseWebRoot(_webRoot);
-                logger.LogInformation($"wwwroot-Path: {_webRoot}");
+                if (!Directory.Exists(WebRoot))
+                    Directory.CreateDirectory(WebRoot);
+                WebHostBuilder.UseWebRoot(WebRoot);
+                logger.LogInformation($"wwwroot-Path: {WebRoot}");
             }
             catch (Exception e)
             {
-                logger.LogError(e, $"WebRoot path {_webRoot} cannot be created ");
+                logger.LogError(e, $"WebRoot path {WebRoot} cannot be created ");
             }            
         }
 
@@ -174,12 +176,12 @@ namespace BaSyx.Components.Common
         public virtual void ConfigureEndpoints(Action<IEndpointRouteBuilder> endpoints) => EndpointBuilderPipeline.Add(endpoints);
         public virtual void UseContentRoot(string contentRoot)
         {
-            _contentRoot = contentRoot;
+            ContentRoot = contentRoot;
             WebHostBuilder.UseContentRoot(contentRoot);
         }
         public virtual void UseWebRoot(string webRoot)
         {
-            _webRoot = webRoot;
+            WebRoot = webRoot;
             WebHostBuilder.UseWebRoot(webRoot);
         }
         public virtual void UseUrls(params string[] urls)
@@ -199,7 +201,7 @@ namespace BaSyx.Components.Common
                     string directory = Path.GetDirectoryName(relativeUri.ToString()).TrimStart('\\');
                     logger.LogInformation("Directory: " + directory);
 
-                    string hostingDirectory = Path.Join(_contentRoot, directory);
+                    string hostingDirectory = Path.Join(ContentRoot, directory);
 
                     logger.LogInformation($"Try creating hosting directory if not existing: {hostingDirectory}");
                     Directory.CreateDirectory(hostingDirectory);

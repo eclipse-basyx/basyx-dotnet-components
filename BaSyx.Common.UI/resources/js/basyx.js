@@ -102,6 +102,7 @@ function GetPropertyValue(requestPath, hashedPathIdInput) {
 function ClearFields(hashedRequestPath) {
     $('.argInValue.' + hashedRequestPath).val('');
     $('.argOutValue.' + hashedRequestPath).val('');
+    $('#messageInput_' + hashedRequestPath).val('');
 }
 
 

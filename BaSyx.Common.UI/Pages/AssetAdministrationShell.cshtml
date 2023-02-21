@@ -17,6 +17,10 @@
     }
 
     IAssetAdministrationShell aas = sp.GetBinding();
+    if (aas.AssetInformation != null && aas.AssetInformation.DefaultThumbnail != null)
+    {
+        ViewData["Thumbnail"] = aas.AssetInformation.DefaultThumbnail;
+    }
 
     ViewData["Title"] = settings.UIConfig?.Title ?? aas.IdShort;
     ViewData["ApiRoot"] = AssetAdministrationShellRoutes.AAS;
@@ -32,7 +36,7 @@
 
 @await Html.PartialAsync("_AssetAdministrationShell", aas)
 
-@await Html.PartialAsync("_Asset", aas.Asset)
+@await Html.PartialAsync("_Asset", aas.Asset, ViewData)
 
 @if (submodelServiceProviders?.Count() > 0)
 {

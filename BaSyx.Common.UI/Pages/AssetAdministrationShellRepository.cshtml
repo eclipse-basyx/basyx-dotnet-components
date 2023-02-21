@@ -55,6 +55,10 @@
     foreach (var shellServiceProvider in shellServiceProviders)
     {
         IAssetAdministrationShell aas = shellServiceProvider.GetBinding();
+        if(aas.AssetInformation != null && aas.AssetInformation.DefaultThumbnail != null)
+        {
+            ViewData["Thumbnail"] = aas.AssetInformation.DefaultThumbnail;
+        }
         <div class="card border-dark mb-3">
             <div class="card-header bg-dark">
                 <h4>
@@ -68,8 +72,7 @@
                     @await Html.PartialAsync("_Description", aas.Description)
                 </ul>
                 <div class="card-body">
-                    @await Html.PartialAsync("_Asset", aas.Asset)
-
+                    @await Html.PartialAsync("_Asset", aas.Asset, ViewData)
                     @{
                         IEnumerable<ISubmodelServiceProvider> submodelServiceProviders = null;
                         var retrievedSubmodelServiceProvider = shellServiceProvider.SubmodelProviderRegistry.GetSubmodelServiceProviders();

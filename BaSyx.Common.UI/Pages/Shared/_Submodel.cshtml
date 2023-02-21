@@ -199,22 +199,23 @@ ShowSubmodelElement = @<text>@{
         }
 
         string apiType = (string)ViewData["ApiType"];
-        string requestPath = string.Empty;
+        string pathBase = (string)ViewData["PathBase"];
+        string requestPath = pathBase;
         if (apiType == "AssetAdministrationShell")
         {
-            requestPath = AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
+            requestPath += AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         else if (apiType == "Submodel")
         {
-            requestPath = SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
+            requestPath += SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         else if (apiType == "AssetAdministrationShellRepository")
         {
-            requestPath = AssetAdministrationShellRepositoryRoutes.SHELLS_AAS.Replace("{aasIdentifier}", aasId) + AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
+            requestPath += AssetAdministrationShellRepositoryRoutes.SHELLS_AAS.Replace("{aasIdentifier}", aasId) + AssetAdministrationShellRoutes.AAS_SUBMODELS_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         else if (apiType == "SubmodelRepository")
         {
-            requestPath = SubmodelRepositoryRoutes.SUBMODEL_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
+            requestPath += SubmodelRepositoryRoutes.SUBMODEL_BYID.Replace("{submodelIdentifier}", submodelId) + SubmodelRoutes.SUBMODEL_ELEMENTS_IDSHORTPATH.Replace("{idShortPath}", pathId);
         }
         return requestPath;
     }

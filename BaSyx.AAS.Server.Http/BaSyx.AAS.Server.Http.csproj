@@ -16,7 +16,7 @@
     <PackageIcon>basyxlogo.png</PackageIcon>
     <IsPackable>true</IsPackable>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,14 +34,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <Content Include="..\resources\ServerSettings.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackageFlatten>true</PackageFlatten>
-      <PackagePath>contentFiles\any\$(TargetFramework)\</PackagePath>
-    </Content>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

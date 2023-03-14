@@ -15,7 +15,7 @@
     <PackageIcon>basyxlogo.png</PackageIcon>
     <LangVersion>8.0</LangVersion>
     <Configurations>Debug;Release</Configurations>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -36,8 +36,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
-    <PackageReference Include="BaSyx.API" Version="1.0.1" />
-    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.1" />
+    <PackageReference Include="BaSyx.API" Version="1.0.2" />
+    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.2" />
   </ItemGroup>
 
 

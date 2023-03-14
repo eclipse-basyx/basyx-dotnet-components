@@ -14,7 +14,7 @@
     <PackageIcon>basyxlogo.png</PackageIcon>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,9 +35,9 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
-    <PackageReference Include="BaSyx.API" Version="1.0.1" />
-    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.1" />
-    <PackageReference Include="BaSyx.Utils" Version="1.0.1" />
+    <PackageReference Include="BaSyx.API" Version="1.0.2" />
+    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.2" />
+    <PackageReference Include="BaSyx.Utils" Version="1.0.2" />
   </ItemGroup>
 
 
@@ -51,14 +51,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <EmbeddedResource Include="..\resources\ServerSettings.xml">
-      <PackagePath>contentFiles\any\$(TargetFramework)\</PackagePath>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <PackageFlatten>true</PackageFlatten>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <Pack>true</Pack>
-    </EmbeddedResource>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

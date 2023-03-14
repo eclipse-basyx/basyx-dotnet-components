@@ -15,7 +15,7 @@
     <PackageIcon>basyxlogo.png</PackageIcon>
     <LangVersion>8.0</LangVersion>
     <Configurations>Debug;Release</Configurations>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,15 +31,7 @@
     <None Include="..\resources\basyxlogo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
-    </None>
-    <Content Include="FileBasedRegistrySettings.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackageFlatten>true</PackageFlatten>
-      <PackagePath>contentFiles\any\$(TargetFramework)\</PackagePath>
-    </Content>
+    </None>   
   </ItemGroup>
 
   <ItemGroup Condition="Exists('..\..\basyx-dotnet-sdk\')">
@@ -48,8 +40,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\basyx-dotnet-sdk\')">
-    <PackageReference Include="BaSyx.API" Version="1.0.1" />
-    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.1" />
+    <PackageReference Include="BaSyx.API" Version="1.0.2" />
+    <PackageReference Include="BaSyx.Utils.DependencyInjection" Version="1.0.2" />
   </ItemGroup>
 
 

@@ -17,6 +17,11 @@ using System.IO;
 using BaSyx.Models.AdminShell;
 using System.Linq;
 using BaSyx.Utils.FileSystem;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using BaSyx.Models.Extensions;
+using System;
+using BaSyx.Utils.ResultHandling;
 
 namespace BaSyx.API.Http.Controllers.PackageService
 {
@@ -25,7 +30,7 @@ namespace BaSyx.API.Http.Controllers.PackageService
     /// </summary>
     public class FileServerController : Controller
     {
-        private readonly IServiceProvider serviceProvider;
+        private readonly IFileServiceProvider serviceProvider;
 
 #if NETCOREAPP3_1
         private readonly IWebHostEnvironment hostingEnvironment;
@@ -48,7 +53,7 @@ namespace BaSyx.API.Http.Controllers.PackageService
         /// </summary>
         /// <param name="serviceProvider">The Service Provider implementation provided by the dependency injection</param>
         /// <param name="environment">The Hosting Environment provided by the dependency injection</param>
-        public FileServerController(IServiceProvider serviceProvider, IHostingEnvironment environment)
+        public FileServerController(IFileServiceProvider serviceProvider, IHostingEnvironment environment)
         {
             this.serviceProvider = serviceProvider;
             hostingEnvironment = environment;
@@ -57,6 +62,90 @@ namespace BaSyx.API.Http.Controllers.PackageService
 
 #endif
 
-     
+        /// <summary>
+        /// Returns a list of available AASX packages at the server
+        /// </summary>
+        /// <returns>Requested package list</returns>
+        /// <response code="200"></response>     
+        [HttpGet("packages", Name = "GetAllAASXPackageIds")]
+        [ProducesResponseType(200, Type = typeof(List<PackageDescription>))]
+        public IActionResult GetAllAASXPackageIds()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Stores the AASX package at the server
+        /// </summary>
+        /// <returns>Package Description</returns>
+        /// <response code="200"></response>     
+        [HttpPost("packages", Name = "PostAASXPackage")]
+        [ProducesResponseType(201, Type = typeof(PackageDescription))]
+        [DisableRequestSizeLimit]
+        public IActionResult PostAASXPackage([FromForm] List<string> aasIds, [FromForm] IFormFile file, [FromForm] string fileName)
+        {
+            PackageDescription packageDescription = new PackageDescription()
+            {
+                AdminShellIds = aasIds,
+                PackageId = Guid.NewGuid().ToString(),
+                FileName = fileName
+            };
+
+            try
+            {
+                //using (var stream = file.OpenReadStream())
+                //{
+                //    var result = serviceProvider.CreatePackage(packageDescription, stream);
+                //    if (result.Success)
+                //        return new OkObjectResult(result.Entity);
+                //    else
+                //        return new BadRequestObjectResult(result);
+                //}
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                var result = new Result(e);
+                return new BadRequestObjectResult(result);
+            }
+        }
+
+        /// <summary>
+        /// Returns a specific AASX package from the server
+        /// </summary>
+        /// <returns>Requested AASX package</returns>
+        /// <response code="200"></response>     
+        [HttpGet("packages/{packageId}", Name = "GetAASXByPackageId")]
+        [ProducesResponseType(200, Type = typeof(PackageDescription))]
+        public IActionResult GetAASXByPackageId(string packageId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Updates the AASX package at the server
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="204"></response>     
+        [HttpPut("packages/{packageId}", Name = "PutAASXByPackageId")]
+        [ProducesResponseType(204)]
+        [DisableRequestSizeLimit]
+        public IActionResult PutAASXByPackageId(string packageId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Deletes a specific AASX package from the server
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="204"></response>     
+        [HttpDelete("packages/{packageId}", Name = "DeleteAASXByPackageId")]
+        [ProducesResponseType(204)]
+        public IActionResult DeleteAASXByPackageId(string packageId)
+        {
+            throw new System.NotImplementedException();
+        }
+
     }
 }

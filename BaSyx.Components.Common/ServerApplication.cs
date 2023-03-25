@@ -418,6 +418,11 @@ namespace BaSyx.Components.Common
             if(_secure && !env.IsDevelopment())
                 app.UseHttpsRedirection();
 
+            foreach (var appBuilder in AppBuilderPipeline)
+            {
+                appBuilder.Invoke(app);
+            }
+
             app.UseStaticFiles();
 
             string path = env.ContentRootPath;
@@ -446,12 +451,7 @@ namespace BaSyx.Components.Common
 
             //    return next();
             //});
-
-            foreach (var appBuilder in AppBuilderPipeline)
-            {
-                appBuilder.Invoke(app);
-            }
-
+           
             app.UseRouting();
 
             app.UseCors(

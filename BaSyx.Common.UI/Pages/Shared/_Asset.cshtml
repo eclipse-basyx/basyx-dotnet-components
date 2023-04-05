@@ -9,7 +9,7 @@
             @await Html.PartialAsync("_IdShort", Model.IdShort)
             @await Html.PartialAsync("_Identifier", Model.Identification)
             @await Html.PartialAsync("_Description", Model.Description)
-            @if(ViewData.ContainsKey("Thumbnail"))
+            @if (ViewData.ContainsKey("Thumbnail") && ViewData["Thumbnail"] != null)
             {
                 string thumbnailSrc = ((IFileElement)ViewData["Thumbnail"]).Value;
                  <li class="list-group-item">
